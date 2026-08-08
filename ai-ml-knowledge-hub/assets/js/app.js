@@ -808,90 +808,123 @@
     });
   }
 
-  // ---------- Phase 12: concept-dependency map ----------
+  // ---------- Phase 12: concept-dependency map (vertical hierarchy) ----------
   function renderMap() {
-    var COL_W = 240, NODE_W = 200, HEADER_Y = 44, NODE_H = 40, GAP_Y = 14, PAD_TOP = 18;
-    var cols = CATEGORIES.map(function (c) { return { cat: c, topics: KB[c.id] || [] }; }).filter(function (c) { return c.topics.length; });
-    var maxRows = cols.reduce(function (m, c) { return Math.max(m, c.topics.length); }, 0);
-    var canvasW = cols.length * COL_W;
-    var canvasH = PAD_TOP + HEADER_Y + maxRows * (NODE_H + GAP_Y);
-    var pos = {}; // id -> {x,y,cx,cy}
-    cols.forEach(function (col, ci) {
-      var x = ci * COL_W + (COL_W - NODE_W) / 2;
-      col.topics.forEach(function (t, ri) {
-        var y = PAD_TOP + HEADER_Y + ri * (NODE_H + GAP_Y);
-        pos[t.id] = { x: x, y: y, cx: x + NODE_W, cyl: y + NODE_H / 2, lx: x, cy: y + NODE_H / 2, ri: ri, ci: ci };
-      });
-    });
-    // edges from prerequisites: prereq (source, earlier) -> topic (target)
+    // Prerequisite edges across every topic (source = prerequisite, target = topic).
     var edges = [];
     TOPICS.forEach(function (t) {
       (t.prerequisites || []).forEach(function (p) {
-        if (pos[p] && pos[t.id]) edges.push({ from: p, to: t.id });
+        if (BY_ID[p] && BY_ID[t.id]) edges.push({ from: p, to: t.id });
       });
     });
-    // adjacency for highlight
-    var PRE = {}, POST = {};
-    edges.forEach(function (e) { (PRE[e.to] = PRE[e.to] || []).push(e.from); (POST[e.from] = POST[e.from] || []).push(e.to); });
+    var PRE = {}, POST = {}, connected = {};
+    edges.forEach(function (e) {
+      (PRE[e.to] = PRE[e.to] || []).push(e.from);
+      (POST[e.from] = POST[e.from] || []).push(e.to);
+      connected[e.from] = 1; connected[e.to] = 1;
+    });
     function walk(id, adj, seen) { (adj[id] || []).forEach(function (n) { if (!seen[n]) { seen[n] = 1; walk(n, adj, seen); } }); }
 
-    var svg = '<svg class="map-edges" width="' + canvasW + '" height="' + canvasH + '" viewBox="0 0 ' + canvasW + ' ' + canvasH + '">';
-    edges.forEach(function (e) {
-      var a = pos[e.from], b = pos[e.to];
-      var x1, y1, x2, y2;
-      // draw from right edge of the left-most node to left edge of the right-most node
-      if (a.ci <= b.ci) { x1 = a.x + NODE_W; y1 = a.cy; x2 = b.x; y2 = b.cy; }
-      else { x1 = a.x; y1 = a.cy; x2 = b.x + NODE_W; y2 = b.cy; }
-      var dx = Math.max(30, Math.abs(x2 - x1) / 2);
-      var d = "M" + x1 + " " + y1 + " C" + (x1 + (x2 > x1 ? dx : -dx)) + " " + y1 + " " + (x2 - (x2 > x1 ? dx : -dx)) + " " + y2 + " " + x2 + " " + y2;
-      svg += '<path class="map-edge" data-from="' + e.from + '" data-to="' + e.to + '" d="' + d + '"/>';
-    });
-    svg += "</svg>";
-
-    var nodesHtml = "";
-    cols.forEach(function (col, ci) {
-      nodesHtml += '<div class="map-colhead" style="left:' + (ci * COL_W) + "px;width:" + COL_W + 'px">' + ICONS[col.cat.id] + "<span>" + esc(col.cat.label) + "</span></div>";
-      col.topics.forEach(function (t) {
-        var p = pos[t.id];
-        nodesHtml += '<a class="map-node ' + DIFF_CLASS[t.difficulty] + (isDone(t.id) ? " done" : "") + '" data-id="' + t.id + '" href="#t/' + t.id + '" ' +
-          'style="left:' + p.x + "px;top:" + p.y + "px;width:" + NODE_W + "px;height:" + NODE_H + 'px">' +
-          '<span class="mn-dot"></span><span class="mn-label">' + esc(t.title) + "</span>" +
-          (isDone(t.id) ? '<span class="mn-check">' + ICONS.check.replace('width="20" height="20"', 'width="13" height="13"') + "</span>" : "") + "</a>";
+    // Longest-path depth over the DAG → the vertical level a topic sits on.
+    var depth = {}, visiting = {};
+    function d(id) {
+      if (depth[id] != null) return depth[id];
+      if (visiting[id]) return 0;               // cycle guard (shouldn't happen)
+      visiting[id] = 1;
+      var m = 0;
+      (PRE[id] || []).forEach(function (p) { m = Math.max(m, d(p) + 1); });
+      visiting[id] = 0; depth[id] = m; return m;
+    }
+    var catOrder = {}; CATEGORIES.forEach(function (c, i) { catOrder[c.id] = i; });
+    var connectedIds = Object.keys(connected).filter(function (id) { return BY_ID[id]; });
+    connectedIds.forEach(d);
+    var maxDepth = connectedIds.reduce(function (m, id) { return Math.max(m, depth[id]); }, 0);
+    var layers = []; for (var li = 0; li <= maxDepth; li++) layers.push([]);
+    connectedIds.forEach(function (id) { layers[depth[id]].push(id); });
+    layers.forEach(function (row) {
+      row.sort(function (a, b) {
+        return (catOrder[BY_ID[a].category] - catOrder[BY_ID[b].category]) || BY_ID[a].title.localeCompare(BY_ID[b].title);
       });
     });
+    var orphans = TOPICS.filter(function (t) { return !connected[t.id]; });
 
-    var linked = edges.length;
+    function nodeHtml(id) {
+      var t = BY_ID[id];
+      return '<a class="map-node2 ' + DIFF_CLASS[t.difficulty] + (isDone(id) ? " done" : "") + '" data-id="' + id + '" href="#t/' + id + '" title="' + esc(t.title) + '">' +
+        '<span class="mn-dot"></span><span class="mn-label">' + esc(t.title) + "</span>" +
+        (isDone(id) ? '<span class="mn-check">' + ICONS.check.replace('width="20" height="20"', 'width="13" height="13"') + "</span>" : "") + "</a>";
+    }
+
     var h = '<div class="content-inner">';
     h += '<div class="breadcrumb"><a href="#home">Home</a><span class="sep">/</span><span class="cur">Concept map</span></div>';
-    h += '<div class="hero" style="margin-bottom:var(--space-4)"><div class="eyebrow">Phase 12 · dependency map</div><h1>How the concepts connect</h1>' +
-      "<p>Every topic laid out left-to-right in learning order. Lines run from a prerequisite to the concept it unlocks. Hover a node to light up its full chain — what it needs, and what it leads to. Click to open it.</p></div>";
+    h += '<div class="hero" style="margin-bottom:var(--space-4)"><div class="eyebrow">Dependency map</div><h1>How the concepts connect</h1>' +
+      "<p>Topics stack in dependency order — each level builds on the ones above it. Lines run from a prerequisite down to the concept it unlocks; hover a topic to light up its full chain. Standalone topics, with no mapped prerequisites, sit in the side lane.</p></div>";
     h += '<div class="map-legend">' +
       '<span class="map-lg"><span class="lg-line"></span> prerequisite → unlocks</span>' +
       '<span class="map-lg"><span class="lg-dot beginner"></span> Beginner</span>' +
       '<span class="map-lg"><span class="lg-dot intermediate"></span> Intermediate</span>' +
       '<span class="map-lg"><span class="lg-dot advanced"></span> Advanced</span>' +
       '<span class="map-lg"><span class="lg-dot done"></span> completed</span>' +
-      '<span class="map-lg map-count">' + linked + " prerequisite links mapped</span></div>";
-    h += '<div class="map-scroll"><div class="map-canvas" style="width:' + canvasW + "px;height:" + canvasH + 'px">' + svg + nodesHtml + "</div></div>";
-    h += '<div class="viz-note">Prerequisite links come from the topic enrichment data and grow as it rolls out across all ' + ORDER.length + " topics. Columns follow the guided category order.</div>";
+      '<span class="map-lg map-count">' + edges.length + " prerequisite links mapped</span></div>";
+
+    h += '<div class="map2"><div class="map2-flow"><svg class="map2-edges" id="mapEdges"></svg>';
+    layers.forEach(function (row, i) {
+      h += '<div class="map2-layer"><div class="map2-layer-k">' +
+        (i === 0 ? "Start here · no prerequisites" : "Level " + (i + 1)) + " · " + row.length + (row.length === 1 ? " topic" : " topics") +
+        '</div><div class="map2-row">' + row.map(nodeHtml).join("") + "</div></div>";
+    });
+    h += "</div>"; // .map2-flow
+    if (orphans.length) {
+      h += '<aside class="map2-orphans"><div class="map2-layer-k">Standalone (' + orphans.length + ")</div>" +
+        '<div class="map2-row">' + orphans.map(function (t) { return nodeHtml(t.id); }).join("") + "</div></aside>";
+    }
+    h += "</div>"; // .map2
+    h += '<div class="viz-note">Prerequisite links come from the topic enrichment data and grow as it rolls out across all ' + ORDER.length + " topics.</div>";
     h += "</div>";
     content.innerHTML = h; content.scrollTop = 0;
 
-    var edgeEls = content.querySelectorAll(".map-edge");
-    var nodeEls = content.querySelectorAll(".map-node");
+    // Draw edges by measuring real node positions — survives wrapping and resize.
+    var flow = content.querySelector(".map2-flow");
+    var svg = content.querySelector("#mapEdges");
+    function layoutEdges() {
+      if (!flow || !svg) return;
+      var fr = flow.getBoundingClientRect();
+      svg.setAttribute("width", fr.width); svg.setAttribute("height", fr.height);
+      svg.setAttribute("viewBox", "0 0 " + fr.width + " " + fr.height);
+      svg.innerHTML = edges.map(function (e) {
+        var a = flow.querySelector('.map-node2[data-id="' + e.from + '"]');
+        var b = flow.querySelector('.map-node2[data-id="' + e.to + '"]');
+        if (!a || !b) return "";
+        var ar = a.getBoundingClientRect(), br = b.getBoundingClientRect();
+        var x1 = ar.left + ar.width / 2 - fr.left, y1 = ar.bottom - fr.top;
+        var x2 = br.left + br.width / 2 - fr.left, y2 = br.top - fr.top;
+        var dy = Math.max(16, (y2 - y1) / 2);
+        var dd = "M" + x1 + " " + y1 + " C" + x1 + " " + (y1 + dy) + " " + x2 + " " + (y2 - dy) + " " + x2 + " " + y2;
+        return '<path class="map-edge2" data-from="' + esc(e.from) + '" data-to="' + esc(e.to) + '" d="' + dd + '"/>';
+      }).join("");
+    }
+    layoutEdges();
+    // Recompute once layout settles (initial paint, web-font width shifts) so the
+    // edges never stay stuck on a stale/zero-width first measurement.
+    requestAnimationFrame(layoutEdges);
+    setTimeout(layoutEdges, 250);
+    if (window.__mapResize) window.removeEventListener("resize", window.__mapResize);
+    window.__mapResize = function () { if (content.querySelector("#mapEdges")) layoutEdges(); };
+    window.addEventListener("resize", window.__mapResize);
+
+    var nodeEls = content.querySelectorAll(".map-node2");
     Array.prototype.forEach.call(nodeEls, function (node) {
       node.addEventListener("mouseenter", function () {
         var id = node.getAttribute("data-id");
-        var set = {}; set[id] = 1;
-        walk(id, PRE, set); walk(id, POST, set);
-        content.querySelector(".map-canvas").classList.add("focusing");
+        var set = {}; set[id] = 1; walk(id, PRE, set); walk(id, POST, set);
+        flow.classList.add("focusing");
         Array.prototype.forEach.call(nodeEls, function (n) { n.classList.toggle("lit", !!set[n.getAttribute("data-id")]); });
-        Array.prototype.forEach.call(edgeEls, function (e) { e.classList.toggle("lit", !!set[e.getAttribute("data-from")] && !!set[e.getAttribute("data-to")]); });
+        Array.prototype.forEach.call(svg.querySelectorAll(".map-edge2"), function (ed) { ed.classList.toggle("lit", !!set[ed.getAttribute("data-from")] && !!set[ed.getAttribute("data-to")]); });
       });
       node.addEventListener("mouseleave", function () {
-        content.querySelector(".map-canvas").classList.remove("focusing");
+        flow.classList.remove("focusing");
         Array.prototype.forEach.call(nodeEls, function (n) { n.classList.remove("lit"); });
-        Array.prototype.forEach.call(edgeEls, function (e) { e.classList.remove("lit"); });
+        Array.prototype.forEach.call(svg.querySelectorAll(".map-edge2"), function (ed) { ed.classList.remove("lit"); });
       });
     });
     renderSidebar();

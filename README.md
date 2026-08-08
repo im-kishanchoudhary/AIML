@@ -21,21 +21,24 @@ Then visit <http://127.0.0.1:8777/ai-ml-knowledge-hub/index.html>.
 ## Project layout
 
 ```
-ai-ml-knowledge-hub/
-  index.html            # app shell (loads data, then the app)
-  assets/css/           # organic.css (design tokens) + app.css
-  assets/js/            # viz.js (interactive diagrams) + app.js (controller)
-  data/                 # 16 content modules → window.KB, PATHS, PROJECTS, …
-  AI_RULES.md           # content & design rules the hub follows
+ai-ml-knowledge-hub/      # the published site (only this folder is deployed)
+  index.html              #   app shell (loads data, then the app)
+  assets/css/             #   organic.css (design tokens) + app.css
+  assets/js/              #   viz.js (interactive diagrams) + app.js (controller)
+  data/                   #   16 content modules → window.KB, PATHS, PROJECTS, …
+docs/                     # project governance (not deployed)
+  WORKSHOP-SPEC.md        #   scope, audience, features — the source of truth
+  AI_RULES.md             #   how content and code are authored
 ```
 
 ## Hosting (automatic)
 
 Pushing to `main` publishes to **GitHub Pages** via
 [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml). The
-workflow uploads the `ai-ml-knowledge-hub/` folder as the site root, so the app
-serves from the repository's Pages URL. All asset paths are relative, so it works
-whether Pages serves from a root or a `/<repo>/` subpath.
+workflow uploads **only** the `ai-ml-knowledge-hub/` folder as the site root, so
+governance docs in `docs/` stay in the repo but never ship with the site. All
+asset paths are relative, so it works whether Pages serves from a root or a
+`/<repo>/` subpath.
 
 **One-time setup:** in the repo, go to **Settings → Pages → Build and deployment →
 Source** and select **GitHub Actions**. After that, every push to `main` deploys

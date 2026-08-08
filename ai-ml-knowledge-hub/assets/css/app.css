@@ -109,13 +109,19 @@ body { min-height: 100vh; }
 }
 .menu-btn { display: none; }
 .search-trigger {
-  flex: 1; max-width: 460px;
+  flex: 1; max-width: 460px; min-width: 0;
   display: flex; align-items: center; gap: 10px;
   padding: 9px 14px; cursor: text;
   background: var(--color-surface);
   border: 1px solid var(--color-divider); border-radius: 999px;
   color: color-mix(in srgb, var(--color-text) 55%, transparent);
   font-size: 14px;
+}
+/* Keep the placeholder on one line so a squeezed pill never grows taller
+   than the topbar — it truncates with an ellipsis instead. */
+.search-trigger > span:not(.kbd) {
+  flex: 1 1 auto; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .search-trigger:hover { border-color: color-mix(in srgb, var(--color-text) 40%, transparent); }
 .search-trigger .kbd {
@@ -132,6 +138,17 @@ body { min-height: 100vh; }
   padding: 7px 12px; border-radius: 999px;
 }
 .topbar-link:hover { background: color-mix(in srgb, var(--color-text) 6%, transparent); color: var(--color-text); }
+
+/* Section links live inside the sidebar drawer on mobile (hidden on desktop,
+   where the same destinations sit in the topbar). Base rule declared before the
+   mobile media query so the query's display:flex wins at equal specificity. */
+.nav-sections { display: none; flex-wrap: wrap; gap: 6px; padding: 0 var(--space-5) var(--space-4); }
+.nav-sections a {
+  font-size: 13px; text-decoration: none; color: var(--color-text);
+  padding: 7px 13px; border-radius: 999px;
+  background: var(--color-surface); border: 1px solid var(--color-divider);
+}
+.nav-sections a:hover { border-color: var(--color-accent-400); }
 
 .content { flex: 1; overflow-y: auto; padding: var(--space-8) var(--space-6) 80px; }
 .content-inner { max-width: var(--content-max); margin: 0 auto; }
@@ -525,6 +542,14 @@ pre.code .str { color: #aebf92; }
   .hero h1 { font-size: 34px; }
   .content { padding: var(--space-6) var(--space-4) 60px; }
   .topbar { padding: 0 var(--space-4); }
+  /* The topbar destinations move into the sidebar drawer on small screens,
+     so the topbar keeps just: menu · search · print · help. */
+  .topbar-link { display: none; }
+  .nav-sections { display: flex; }
+  /* Concept map: drop the standalone lane below the flow instead of beside it. */
+  .map2 { grid-template-columns: 1fr; }
+  .map2-orphans { border-left: 0; border-top: 1px solid var(--color-divider); padding-left: 0; padding-top: var(--space-4); max-width: none; }
+  .map2-orphans .map2-row { flex-direction: row; }
 }
 @media (max-width: 520px) {
   .search-trigger .kbd { display: none; }
@@ -562,6 +587,29 @@ pre.code .str { color: #aebf92; }
 .map-node .mn-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .map-node .mn-check { flex: none; margin-left: auto; color: var(--color-accent-2-600); display: flex; }
 .map-node.done { background: var(--color-accent-2-100); border-color: var(--color-accent-2-300); }
+
+/* ---------- Vertical dependency hierarchy (replaces the wide column canvas) ---------- */
+.map2 { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-5); align-items: start; background: var(--color-surface); border-radius: var(--radius-lg); padding: var(--space-5); }
+.map2-flow { position: relative; display: flex; flex-direction: column; gap: var(--space-6); }
+.map2-edges { position: absolute; inset: 0; pointer-events: none; overflow: visible; z-index: 1; }
+.map2-layer { position: relative; z-index: 2; }
+.map2-layer-k { font-family: var(--font-heading); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--color-accent-700); margin-bottom: 10px; }
+.map2-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.map-node2 { position: relative; z-index: 2; display: inline-flex; align-items: center; gap: 8px; max-width: 240px; padding: 8px 14px; background: var(--color-bg); border: 1.5px solid var(--color-divider); border-radius: 999px; text-decoration: none; color: var(--color-text); font-size: 12.5px; line-height: 1.15; transition: transform .12s, box-shadow .12s, border-color .12s, opacity .15s; }
+.map-node2:hover, .map-node2.lit { border-color: var(--color-accent-400); box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+.map-node2 .mn-dot { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--color-neutral-400); }
+.map-node2.beginner .mn-dot { background: var(--color-accent-2-500); }
+.map-node2.intermediate .mn-dot { background: var(--color-accent-400); }
+.map-node2.advanced .mn-dot { background: var(--color-accent-600); }
+.map-node2 .mn-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.map-node2 .mn-check { flex: none; color: var(--color-accent-2-600); display: flex; }
+.map-node2.done { background: var(--color-accent-2-100); border-color: var(--color-accent-2-300); }
+.map2-flow.focusing .map-node2:not(.lit) { opacity: .28; }
+.map-edge2 { fill: none; stroke: var(--color-neutral-400); stroke-width: 1.6; opacity: .5; transition: stroke .15s, opacity .15s, stroke-width .15s; }
+.map2-flow.focusing .map-edge2:not(.lit) { opacity: .12; }
+.map-edge2.lit { stroke: var(--color-accent); stroke-width: 2.4; opacity: 1; }
+.map2-orphans { border-left: 1px solid var(--color-divider); padding-left: var(--space-4); max-width: 230px; }
+.map2-orphans .map2-row { flex-direction: column; align-items: flex-start; }
 
 /* ============================================================
    Phase 13 — build-along projects
