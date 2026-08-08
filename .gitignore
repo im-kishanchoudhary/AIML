@@ -1,0 +1,20 @@
+# --- Design-tool handoff artifacts (not part of the hosted app) ---
+/Artifacts/
+/project/
+/_ds/
+/uploads/
+.thumbnail
+
+# --- OS / editor cruft ---
+.DS_Store
+Thumbs.db
+*~
+.idea/
+.vscode/
+
+# --- Node (only if you later add tooling) ---
+node_modules/
+npm-debug.log*
+
+# --- Claude Code local (personal) settings ---
+.claude/settings.local.json

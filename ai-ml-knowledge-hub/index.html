@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI/ML Knowledge Hub — Interactive Cheat Sheet</title>
+  <meta name="description" content="An interactive, searchable cheat sheet for Data Science, AI, Machine Learning, Generative AI and MLOps — built for software engineers.">
+  <link rel="stylesheet" href="assets/css/organic.css">
+  <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-head">
+        <a href="#home" class="brand-mark" aria-label="Home" style="text-decoration:none">AI</a>
+        <div class="brand-text">
+          <div class="t">Knowledge Hub</div>
+          <div class="s">DS · AI · ML · GenAI · MLOps</div>
+        </div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Learning progress</span><span id="progPct">0%</span></div>
+        <div class="progress-track"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+        <div class="progress-label" style="margin-top:6px;text-transform:none;letter-spacing:0"><span id="progCount">0 / 0</span><span>topics complete</span></div>
+      </div>
+      <nav class="nav-scroll" id="navScroll" aria-label="Topics"></nav>
+    </aside>
+    <div class="scrim" id="scrim"></div>
+
+    <!-- Main -->
+    <div class="main">
+      <header class="topbar">
+        <button class="btn btn-icon btn-secondary menu-btn" id="menuBtn" aria-label="Open menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+        <button class="search-trigger" id="searchTrigger" aria-label="Search (Ctrl K)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <span>Search topics, definitions, examples…</span>
+          <span class="kbd"><b>Ctrl</b><b>K</b></span>
+        </button>
+        <div class="topbar-spacer"></div>
+        <a class="topbar-link" href="#dashboard">Dashboard</a>
+        <a class="topbar-link" href="#paths">Paths</a>
+        <a class="topbar-link" href="#projects">Projects</a>
+        <a class="topbar-link" href="#map">Map</a>
+        <a class="topbar-link" href="#glossary">Glossary</a>
+        <button class="btn btn-icon btn-secondary" id="printBtn" aria-label="Print / Save as PDF" title="Print / Save as PDF">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="7" rx="1"/></svg>
+        </button>
+        <button class="btn btn-icon btn-secondary" id="kbHelpBtn" aria-label="Keyboard shortcuts" title="Keyboard shortcuts (press ?)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 13h.01M18 13h.01M9 13h6"/></svg>
+        </button>
+      </header>
+      <div class="modebar" id="modeBar" role="tablist" aria-label="View mode"></div>
+      <main class="content" id="content"></main>
+    </div>
+  </div>
+
+  <!-- Search modal -->
+  <div class="search-modal" id="searchModal" role="dialog" aria-modal="true" aria-label="Search">
+    <div class="search-panel">
+      <div class="search-input-row">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="searchInput" type="text" placeholder="Search everything — try 'overfitting', 'RAG', 'standard deviation'…" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="search-results" id="searchResults"></div>
+      <div class="search-foot">
+        <span><b>↑</b><b>↓</b> navigate</span>
+        <span><b>↵</b> open</span>
+        <span><b>esc</b> close</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Keyboard shortcuts modal -->
+  <div class="kb-modal" id="kbModal" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <div class="kb-panel">
+      <div class="kb-head"><h2>Keyboard shortcuts</h2><button class="btn btn-icon btn-ghost" id="kbClose" aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      <div class="kb-grid" id="kbGrid"></div>
+      <div class="kb-foot">Shortcuts are ignored while you're typing in a field.</div>
+    </div>
+  </div>
+
+  <!-- Data -->
+  <script src="data/fundamentals.js"></script>
+  <script src="data/python.js"></script>
+  <script src="data/numpy.js"></script>
+  <script src="data/pandas.js"></script>
+  <script src="data/visualization.js"></script>
+  <script src="data/statistics.js"></script>
+  <script src="data/machine-learning.js"></script>
+  <script src="data/deep-learning.js"></script>
+  <script src="data/generative-ai.js"></script>
+  <script src="data/mlops.js"></script>
+  <script src="data/glossary.js"></script>
+  <script src="data/extras.js"></script>
+  <script src="data/enrichment.js"></script>
+  <script src="data/paths.js"></script>
+  <script src="data/quizzes.js"></script>
+  <script src="data/projects.js"></script>
+  <!-- App -->
+  <script src="assets/js/viz.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
