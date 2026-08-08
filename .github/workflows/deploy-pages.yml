@@ -30,6 +30,10 @@ jobs:
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
+        with:
+          # Turn Pages on automatically on the first run so no manual
+          # Settings → Pages step is needed.
+          enablement: true
 
       - name: Upload site (ai-ml-knowledge-hub as root)
         uses: actions/upload-pages-artifact@v3
