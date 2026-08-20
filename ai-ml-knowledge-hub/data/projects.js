@@ -280,11 +280,36 @@ window.PROJECTS = [
     dataset: "A few inline text chunks; point it at your own .txt / .md files once the loop works.",
     outcome: "A fully offline RAG pipeline (no API keys, no data leaving your machine) plus a fine-tuned embedder tuned to your domain.",
     stack: ["sentence-transformers", "numpy", "Ollama", "PyTorch (CPU or GPU)"],
+    story: "Think of a plain LLM as a **brilliant but forgetful professor** — widely read, but they've never seen *your* documents and will confidently make things up about them. RAG turns that professor into **an experienced teacher who has just read your thesis** and answers strictly from it: they look up the relevant page before speaking, and point to where the answer came from. This project builds that teacher on your own machine.",
+    lifecycle: [
+      { icon: "🧠", label: "Hire the tutor", sub: "install a local LLM", to: 0 },
+      { icon: "👓", label: "Teach it to read meaning", sub: "load the embedder", to: 1 },
+      { icon: "📚", label: "Hand over your documents", sub: "chunk + embed", to: 2 },
+      { icon: "🔎", label: "Look up the right page", sub: "retrieve", to: 3 },
+      { icon: "🗣️", label: "Answer from the page", sub: "generate + cite", to: 4 },
+      { icon: "🎓", label: "Specialise the tutor", sub: "fine-tune", to: 5 }
+    ],
+    concept: {
+      q: "What does RAG actually change?",
+      a: "A plain LLM answers from memory and can bluff about anything it never studied — including your private documents. RAG inserts a **look-it-up-first** step: retrieve the relevant text, then answer *only* from it. So the model stays current, works on your own data, and can point to its source — **without any retraining.**"
+    },
+    capabilities: [
+      "Answers questions about **your own documents**, not just what the model was trained on",
+      "Runs **fully offline** — your files never leave your machine",
+      "Can **cite the source passage** for every answer, which curbs made-up facts",
+      "Swap in new documents any time by re-embedding — **no retraining needed**"
+    ],
+    limitations: [
+      "Only as good as what you feed it — **missing or messy documents give weak answers**",
+      "A small local model is less fluent than a big cloud one — great for facts, not deep reasoning",
+      "Retrieval can miss context if chunks are too big or too small — **how you split documents matters**"
+    ],
     steps: [
       {
         title: "Install the local stack",
         topic: "rag",
         detail: "Two pieces: sentence-transformers (pulls in PyTorch) for embeddings, and Ollama to run an LLM locally. The 3B model is ~2 GB, runs on CPU, and is much faster on a GPU.",
+        analogy: "**Hire the tutor and set up the room.** You bring in the well-read expert (the local LLM via Ollama) and the desk and tools (the Python libraries). Nothing about your documents yet — you're just getting the expert and the workspace ready.",
         code: "# 1) Python libraries (sentence-transformers pulls in PyTorch)\npip install sentence-transformers numpy\n\n# 2) Install Ollama (runs LLMs locally): https://ollama.com/download\n#    then pull a small, fast model:\nollama pull llama3.2:3b\n\n# 3) Confirm it runs (Ollama serves on http://localhost:11434)\nollama run llama3.2:3b \"say hi in three words\"",
         checkpoint: "The model replies in your terminal — an LLM is now running locally on your CPU/GPU."
       },
@@ -292,6 +317,7 @@ window.PROJECTS = [
         title: "Load a local embedding model",
         topic: "tokens-embeddings",
         detail: "all-MiniLM-L6-v2 is ~90 MB, downloads once, then works fully offline. It maps text to 384-dim vectors and uses your GPU automatically if you have one.",
+        analogy: "**Teach the tutor to understand meaning, not just words.** The embedding model is that sense of meaning — so a question about 'getting my money back' will later find the 'refund' passage even though they share no words.",
         code: "from sentence_transformers import SentenceTransformer\nembedder = SentenceTransformer('all-MiniLM-L6-v2')\nprint('embedding dim:', embedder.get_sentence_embedding_dimension())  # 384",
         checkpoint: "Prints 384 — your local embedder is ready (no network after the first download)."
       },
@@ -299,6 +325,7 @@ window.PROJECTS = [
         title: "Chunk and embed your documents",
         topic: "vector-search",
         detail: "Retrieval works on small, self-contained pieces. Embed each chunk once and keep the matrix. Normalising the vectors lets a plain dot product act as cosine similarity.",
+        analogy: "**Hand over your documents and let the tutor make an index.** Each passage becomes a searchable 'meaning fingerprint', so later they can flip straight to the right page instead of re-reading the whole book.",
         code: "import numpy as np\ndocs = [\n  'Refunds are available within 30 days of purchase with a receipt.',\n  'Support is available Monday to Friday, 9am to 6pm UK time.',\n  'The Pro plan includes unlimited projects and priority support.',\n  'All data is encrypted at rest and in transit using AES-256.',\n]\nemb = embedder.encode(docs, normalize_embeddings=True)\nemb = np.asarray(emb, dtype='float32')\nprint('index shape:', emb.shape)   # (4, 384)",
         checkpoint: "(4, 384) prints — every chunk is now a local vector."
       },
@@ -306,6 +333,7 @@ window.PROJECTS = [
         title: "Retrieve the relevant chunks",
         topic: "vector-search",
         detail: "Embed the question the same way and rank chunks by cosine similarity. Top-k are your evidence. For big corpora, swap the numpy dot for FAISS (`pip install faiss-cpu`).",
+        analogy: "**Ask a question and the tutor flips to the most relevant pages.** They pull only the few passages that actually answer you — the 'evidence' the answer will be built from — rather than reciting the whole thesis.",
         code: "def retrieve(question, k=2):\n    q = embedder.encode([question], normalize_embeddings=True)[0]\n    scores = emb @ np.asarray(q, dtype='float32')   # cosine (vectors normalized)\n    top = scores.argsort()[::-1][:k]\n    return [docs[i] for i in top]\n\nprint(retrieve('how many days do I have to return something?'))",
         checkpoint: "The refund chunk comes back first — semantic search is working locally."
       },
@@ -313,6 +341,7 @@ window.PROJECTS = [
         title: "Generate a grounded answer with the local LLM",
         topic: "generative-ai-llm",
         detail: "Put the retrieved context into the prompt and instruct the model to answer ONLY from it. The `ollama` package talks to your local server — nothing leaves the machine.",
+        analogy: "**The tutor answers out loud, from the open page.** They speak using only the passages just retrieved — so the reply stays grounded in your documents and they can't wander off and invent things.",
         code: "# pip install ollama\nimport ollama\n\ndef answer(question):\n    ctx = retrieve(question)\n    prompt = (\n        'Answer using ONLY the context. If it is not there, say you do not know.\\n\\n'\n        'Context:\\n- ' + '\\n- '.join(ctx) +\n        '\\n\\nQuestion: ' + question + '\\nAnswer:'\n    )\n    r = ollama.chat(model='llama3.2:3b',\n                    messages=[{'role': 'user', 'content': prompt}])\n    return r['message']['content']\n\nprint(answer('When is support open?'))",
         checkpoint: "The model answers 'Monday to Friday, 9am to 6pm' — grounded in your retrieved chunk, generated on your machine."
       },
@@ -320,6 +349,7 @@ window.PROJECTS = [
         title: "Fine-tune the embedder on your own pairs",
         topic: "rag-vs-finetuning",
         detail: "Retrieval sharpens when the embedder knows your domain. Fine-tune MiniLM on (question, answering-chunk) pairs with a contrastive loss — small enough to run on CPU, quick on GPU. This is the 'self-train' part.",
+        analogy: "**Send the tutor on a short course in your subject.** By training on a handful of your own question → answer pairs, their sense of 'what's relevant' sharpens for your material, so they find the right passage more reliably.",
         code: "from sentence_transformers import InputExample, losses\nfrom torch.utils.data import DataLoader\n\npairs = [\n  InputExample(texts=['how do I get my money back?', docs[0]]),\n  InputExample(texts=['what are your opening hours?', docs[1]]),\n  InputExample(texts=['what is in the paid tier?', docs[2]]),\n]\nloader = DataLoader(pairs, batch_size=3, shuffle=True)\nloss = losses.MultipleNegativesRankingLoss(embedder)\nembedder.fit(train_objectives=[(loader, loss)], epochs=3, warmup_steps=1)\nembedder.save('my-embedder')   # reload later: SentenceTransformer('my-embedder')\nprint('fine-tuned embedder saved to ./my-embedder')",
         checkpoint: "Training runs 3 epochs and saves ./my-embedder — re-embed with it and retrieval gets sharper on your data."
       }
