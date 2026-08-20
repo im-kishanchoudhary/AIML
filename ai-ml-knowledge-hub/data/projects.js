@@ -10,6 +10,31 @@
 window.PROJECTS = [
   {
     id: "churn-model",
+    story: "Like training a **doctor to spot at-risk patients from past records**. You show the model thousands of past customers — who stayed, who left — and it learns the warning signs, so it can flag a new customer heading for the door while there's still time to act.",
+    lifecycle: [
+      { icon: "📋", label: "Gather records", sub: "make the data", to: 0 },
+      { icon: "🧼", label: "Clean the notes", sub: "sanity-check", to: 1 },
+      { icon: "🔬", label: "Spot a signal", sub: "engineer a feature", to: 2 },
+      { icon: "✂️", label: "Hold back a test", sub: "train/test split", to: 3 },
+      { icon: "🎓", label: "Train", sub: "scale + fit", to: 4 },
+      { icon: "📝", label: "Grade it", sub: "evaluate", to: 5 },
+      { icon: "🔎", label: "Read the why", sub: "drivers", to: 6 }
+    ],
+    concept: {
+      q: "What is the model actually learning?",
+      a: "Not a rule you wrote — it learns, from history, the **pattern of who tends to leave** (short tenure, many support calls, month-to-month). Hand it a new customer and it returns a risk score you can act on before they go."
+    },
+    capabilities: [
+      "Scores any customer's **churn risk** from a few fields",
+      "Ranks the **signals** that push a customer toward leaving",
+      "Runs **offline on CPU** in seconds",
+      "Is a template you can point at **real Telco data** later"
+    ],
+    limitations: [
+      "Trained on **synthetic data** — a demo of the method, not production numbers",
+      "Only 4–5 features; real churn has many more signals",
+      "It flags **risk, not proof** — correlation, not a full explanation of cause"
+    ],
     title: "Predict customer churn",
     level: "Beginner",
     blurb: "Build a classifier that flags which customers are about to leave — the classic first end-to-end ML project.",
@@ -71,6 +96,30 @@ window.PROJECTS = [
   },
   {
     id: "rag-chatbot",
+    story: "Like a **research assistant with a library card**. You ask a question; they don't answer from memory — they find the relevant pages first, write an answer grounded in what they just read, and tell you which page it came from. That's RAG: retrieve, then answer.",
+    lifecycle: [
+      { icon: "🧭", label: "Know the loop", sub: "the four stages", to: 0 },
+      { icon: "✂️", label: "Chunk the docs", sub: "split into pieces", to: 1 },
+      { icon: "📍", label: "Embed", sub: "text → vectors", to: 2 },
+      { icon: "🔎", label: "Retrieve", sub: "find nearest chunks", to: 3 },
+      { icon: "🗣️", label: "Augment & answer", sub: "grounded reply", to: 4 },
+      { icon: "⚖️", label: "RAG vs fine-tune", sub: "pick the right tool", to: 5 }
+    ],
+    concept: {
+      q: "Why not just ask the LLM directly?",
+      a: "A raw LLM only knows its training data and will confidently make up anything else — including your documents. RAG feeds it the **relevant text at question time**, so it answers from facts you control and can cite, **without retraining**."
+    },
+    capabilities: [
+      "Answers from **your documents**, with a citation to the source chunk",
+      "Update knowledge by **editing a document** — no retraining",
+      "Works with **any** embedding provider or local model",
+      "The exact pattern behind most enterprise 'chat with your docs' tools"
+    ],
+    limitations: [
+      "Answer quality depends on **retrieval** — bad chunks, bad answer",
+      "Chunking size is a real tuning knob (too big or too small both hurt)",
+      "The demo uses a toy embedding — swap in a real model for production"
+    ],
     title: "Build a RAG document chatbot",
     level: "Intermediate",
     blurb: "Make an LLM answer questions from your own documents — with citations — the flagship applied-AI build.",
@@ -125,6 +174,30 @@ window.PROJECTS = [
   },
   {
     id: "sales-forecast",
+    story: "Like a **seasoned shopkeeper predicting next month's sales**. They don't guess — they look at last month, the same month last year, and the seasonal rhythm, and they only trust a forecast if it beats the lazy 'same as last month' rule of thumb.",
+    lifecycle: [
+      { icon: "🧾", label: "Sales history", sub: "make the series", to: 0 },
+      { icon: "👀", label: "Look first", sub: "describe it", to: 1 },
+      { icon: "🧱", label: "Build features", sub: "lags + calendar", to: 2 },
+      { icon: "⏳", label: "Split by time", sub: "no peeking ahead", to: 3 },
+      { icon: "📈", label: "Fit forecaster", sub: "regression", to: 4 },
+      { icon: "🏁", label: "Beat the baseline", sub: "the honest test", to: 5 }
+    ],
+    concept: {
+      q: "What makes a forecast trustworthy?",
+      a: "Beating a **naive baseline** — 'next month = this month'. A model that can't beat that isn't earning its keep, which is exactly why you always compare its error against the baseline instead of just admiring the predictions."
+    },
+    capabilities: [
+      "Predicts next month from **past values + the calendar**",
+      "Reports an **honest error** measured against a naive baseline",
+      "Simple and interpretable — the right first forecaster",
+      "Swap in your own monthly series to forecast real numbers"
+    ],
+    limitations: [
+      "Linear + lag features — won't capture complex, non-linear demand",
+      "Short synthetic history; real forecasting needs more data and care",
+      "Ignores promotions, prices, holidays — real drivers you'd add as features"
+    ],
     title: "Forecast monthly sales",
     level: "Intermediate",
     blurb: "Turn a history of numbers into a defensible forecast — and learn why a naive baseline is the bar to beat.",
@@ -357,6 +430,29 @@ window.PROJECTS = [
   },
   {
     id: "custom-agent",
+    story: "Like a **junior assistant you trained yourself**, who follows a strict routine: read the task, pick a tool, use it, look at the result, repeat until done. No magic framework — you wrote every rule, so you understand exactly why it acts the way it does.",
+    lifecycle: [
+      { icon: "🧰", label: "Define tools", sub: "functions it can call", to: 0 },
+      { icon: "📜", label: "Describe them", sub: "the JSON contract", to: 1 },
+      { icon: "🔍", label: "Parse a call", sub: "read the model's JSON", to: 2 },
+      { icon: "🔁", label: "Reason–act loop", sub: "the controller", to: 3 },
+      { icon: "🛡️", label: "Guardrails", sub: "allowlist + memory", to: 4 }
+    ],
+    concept: {
+      q: "What actually makes it an \"agent\"?",
+      a: "The **loop**. A normal model answers once. An agent thinks, calls a tool, reads the result, and decides its next move — over and over — so it can *take actions* in the world, not just talk about them."
+    },
+    capabilities: [
+      "Drives **local models** to use tools you define",
+      "Calls the **model you trained** (churn) and your RAG retriever as tools",
+      "About **60 lines you fully understand** — no framework",
+      "Extend it by dropping a new function into the tool registry"
+    ],
+    limitations: [
+      "Small local models can produce malformed tool calls — hence the guardrails",
+      "Single-step reasoning; not a match for production agent frameworks",
+      "`eval`-based calculator is for the demo only — never on untrusted input"
+    ],
     title: "Build a custom agent from scratch",
     level: "Advanced",
     blurb: "No frameworks. Define your own tools, prompt and reason–act loop, and let a local LLM drive tools — including the model you trained and your RAG retriever.",
@@ -404,6 +500,29 @@ window.PROJECTS = [
   },
   {
     id: "ollama-agent",
+    story: "Like giving a capable assistant the **keys to your office** — they can read files and run tasks for you — with one firm rule: **anything risky needs your say-so first**. Ollama's tool-calling is how the assistant decides what to do; the guardrails keep it safe.",
+    lifecycle: [
+      { icon: "🧠", label: "Get a tool model", sub: "one that supports tools", to: 0 },
+      { icon: "🔧", label: "Write actions", sub: "real local functions", to: 1 },
+      { icon: "📜", label: "Declare tools", sub: "JSON schema", to: 2 },
+      { icon: "🤖", label: "Let it call", sub: "the tool loop", to: 3 },
+      { icon: "🛑", label: "Gate risky ones", sub: "human approval", to: 4 }
+    ],
+    concept: {
+      q: "How does a model \"take an action\"?",
+      a: "You expose real functions as **tools**. Instead of answering, the model returns a structured request to call one with arguments; **your code** runs it and hands back the result. The model never touches your machine directly — which is what makes safe local agents possible."
+    },
+    capabilities: [
+      "A local model that **reads files and runs tasks** on your machine",
+      "Uses Ollama's **native tool-calling** — structured, not string-parsing",
+      "**Path-sandboxed** and **human-approved** for anything risky",
+      "Fully offline — no cloud, no API keys"
+    ],
+    limitations: [
+      "Needs a **tool-capable** model (llama3.1 / qwen2.5), which wants more RAM",
+      "An agent with real actions is powerful — the guardrails are not optional",
+      "Only as safe as your allowlist and confirmations — keep them strict"
+    ],
     title: "Local agent with Ollama tool-calling",
     level: "Advanced",
     blurb: "Use Ollama's native function-calling so a local model can take real actions on your machine — read files, query your model, run allow-listed operations — safely.",

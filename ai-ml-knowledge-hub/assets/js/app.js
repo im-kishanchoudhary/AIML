@@ -755,6 +755,7 @@
     if (nextId) h += '<a class="btn btn-primary" href="#t/' + nextId + '">' + (done ? "Continue" : "Start") + ": " + esc(BY_ID[nextId].title) + " →</a>";
     else h += '<span class="tag tag-accent-2" style="padding:10px 18px">✓ Path complete — nice work!</span>';
     h += "</div></div>";
+    h += analogyHtml(p);
     h += '<ol class="path-list">';
     topics.forEach(function (tid, i) {
       var t = BY_ID[tid], d = isDone(tid);
