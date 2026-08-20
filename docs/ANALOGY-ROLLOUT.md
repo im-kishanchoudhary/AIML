@@ -27,7 +27,22 @@ Legend: ✅ done · ⬜ pending · **Flow** = gets an interactive flow strip.
 | hypothesis-testing | A courtroom: innocent until the evidence is surprising enough | — | ✅ |
 | cnn-rnn-transformers | Magnifying glass / reading aloud / reading the whole page at once | — | ✅ |
 
-## Batch 2 — Foundations & tooling (pending)
+## Batch 2 — Hard & hot (done)
+
+| Topic | Analogy hook | Flow | Status |
+|-------|--------------|------|--------|
+| generative-ai-llm | A well-read intern doing super-charged autocomplete | ✅ | ✅ |
+| train-test-split | A mock exam before the real one | ✅ | ✅ |
+| clustering | Seating strangers at a wedding by similarity | ✅ | ✅ |
+| prompt-engineering | Clear instructions to a brilliant, literal assistant | — | ✅ |
+| vector-search | A librarian who finds books by vibe, not title | — | ✅ |
+| rag-vs-finetuning | Look it up vs learn it by heart | — | ✅ |
+| feature-engineering | Giving a detective better clues | — | ✅ |
+| regression | The best-fit trend line through a cloud of dots | — | ✅ |
+| classification | Sorting mail into labelled bins | — | ✅ |
+| correlation | Ice-cream sales and sunburns rise together (not cause) | — | ✅ |
+
+## Batch 3 — Foundations & tooling (pending)
 
 | Topic | Analogy hook | Flow | Status |
 |-------|--------------|------|--------|
@@ -60,17 +75,11 @@ Legend: ✅ done · ⬜ pending · **Flow** = gets an interactive flow strip.
 | variance-std | How consistent a machine's output is | — | ⬜ |
 | normal-distribution | The bell curve of heights in a population | — | ⬜ |
 | probability-basics | A weather forecast's "70% chance" | — | ⬜ |
-| correlation | Ice-cream sales and sunburns rise together (not cause) | — | ⬜ |
 
 ## Batch 5 — Machine Learning (pending)
 
 | Topic | Analogy hook | Flow | Status |
 |-------|--------------|------|--------|
-| regression | Drawing the best-fit trend line through a cloud of dots | — | ⬜ |
-| classification | Sorting mail into labelled bins | — | ⬜ |
-| clustering | Seating strangers by similarity at a party | — | ⬜ |
-| train-test-split | A mock exam before the real one | Flow | ⬜ |
-| feature-engineering | Giving a detective better clues to work from | — | ⬜ |
 | hyperparameter-tuning | Tuning the dials on an oven for the best bake | — | ⬜ |
 | sklearn-workflow | The same recipe steps for any dish | Flow | ⬜ |
 
@@ -79,10 +88,6 @@ Legend: ✅ done · ⬜ pending · **Flow** = gets an interactive flow strip.
 | Topic | Analogy hook | Flow | Status |
 |-------|--------------|------|--------|
 | activation-loss | A dimmer switch (activation) + a scorecard (loss) | — | ⬜ |
-| generative-ai-llm | A very well-read intern doing super-charged autocomplete | — | ⬜ |
-| prompt-engineering | Clear instructions to a brilliant but literal assistant | — | ⬜ |
-| rag-vs-finetuning | Look it up vs learn it by heart | — | ⬜ |
-| vector-search | A librarian who finds books by vibe, not exact title | — | ⬜ |
 | ai-applications | Wiring the model into a product like any other API | — | ⬜ |
 
 ## Batch 7 — MLOps (pending)
@@ -99,4 +104,6 @@ definition. Batched last, after the topic pages land.
 
 ---
 
-**Progress:** 10 / 45 topics · 0 / 37 glossary terms.
+**Progress:** 20 / 45 topics · 0 / 37 glossary terms. Remaining: 25 topics
+(Foundations & tooling 7, NumPy/Pandas/Viz 8, Statistics 4, ML 2, DL & GenAI 2,
+MLOps 2) + glossary.

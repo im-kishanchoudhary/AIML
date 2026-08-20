@@ -53,6 +53,7 @@ window.ENRICH = {
     }
   },
   "regression": {
+    analogy: "Like **drawing the single best trend line through a cloud of dots** and reading it off — 'bigger house ≈ higher price', made precise. Once you have the line, you can estimate the price of a house you've never seen by finding where it lands on it.",
     prerequisites: ["ml-fundamentals", "correlation"],
     plainWords: "You're drawing the single straight line that best passes through a cloud of dots, then using that line to guess the y for any new x — like eyeballing 'bigger house ≈ higher price' but done precisely.",
     actuallyDoes: "Finds the slope and intercept that make the line's total squared vertical distance to all the points as small as possible, then predicts y = slope·x + intercept for new inputs.",
@@ -75,6 +76,16 @@ window.ENRICH = {
     }
   },
   "clustering": {
+    analogy: "Like **seating strangers at a wedding by who seems similar** — no name cards, no known groups, you just cluster people who resemble each other. It finds natural groups in *unlabelled* data (customer segments, say) without being told the answers in advance.",
+    flow: {
+      title: "How k-means finds groups",
+      stages: [
+        { icon: "🎯", label: "Pick k centres", d: "Choose how many groups (k) and drop k starting points at random." },
+        { icon: "🧲", label: "Assign", d: "Each data point joins its nearest centre — forming k tentative clusters." },
+        { icon: "📍", label: "Move centres", d: "Recompute each centre as the average position of its members." },
+        { icon: "🔁", label: "Repeat", d: "Reassign and re-average until the groups stop changing — the clusters have settled." }
+      ]
+    },
     prerequisites: ["ml-fundamentals", "standardization"],
     plainWords: "Nobody labelled the data, so the computer sorts it into piles where things in a pile are near each other — like tipping a mixed bag of Lego onto a table and grouping by colour without being told the colours.",
     actuallyDoes: "Places K centre points, assigns every data point to its nearest centre, moves each centre to the middle of its assigned points, and repeats until the piles stop changing.",
@@ -459,6 +470,7 @@ window.ENRICH = {
     }
   },
   "correlation": {
+    analogy: "Like noticing **ice-cream sales and sunburns rise together** — related, but one doesn't cause the other (hot weather drives both). Correlation measures whether two things move together, from -1 to +1. It's a hint to investigate, **never proof of cause**.",
     prerequisites: ["variance-std"],
     plainWords: "Correlation is a single number from -1 to +1 saying how tightly two things move together: +1 rise together, -1 one rises as the other falls, 0 no linear link. It never proves one causes the other.",
     actuallyDoes: "Standardises the covariance of two variables to [-1, 1], measuring the strength and direction of their linear relationship.",
@@ -526,6 +538,7 @@ window.ENRICH = {
 
   /* ---------- Machine learning ---------- */
   "classification": {
+    analogy: "Like **sorting incoming mail into labelled bins** — spam vs not, approve vs review, churn vs stay. The model learns from past sorted mail what belongs in each bin, then drops each new item into the most likely one — usually with a confidence score.",
     prerequisites: ["ml-fundamentals", "train-test-split"],
     plainWords: "Classification predicts a category, not a number: spam or not, which digit, which disease. The model outputs a probability per class and you pick the most likely.",
     actuallyDoes: "Learns a decision boundary between classes from labelled examples, then assigns new inputs to the class with highest predicted probability.",
@@ -542,6 +555,7 @@ window.ENRICH = {
     }
   },
   "feature-engineering": {
+    analogy: "Like **giving a detective better clues**. The raw case file (the columns) might not crack it, but combine a few facts — 'spend per month of tenure', 'days since last login' — and the pattern jumps out. Often a smart feature beats a fancier model.",
     prerequisites: ["pandas-transform"],
     plainWords: "Models learn from the columns you give them. Feature engineering is crafting better columns — ratios, dates split into parts, categories turned into numbers — often worth more than a fancier algorithm.",
     actuallyDoes: "Transforms raw fields into informative numeric features (encodings, interactions, aggregations) that expose the signal a model can actually use.",
@@ -558,6 +572,16 @@ window.ENRICH = {
     }
   },
   "train-test-split": {
+    analogy: "Like a **mock exam before the real one**. You practise on past papers (training data) but keep one paper sealed for the real test (test data). If you'd peeked at the sealed paper while studying, a great score would prove nothing — which is exactly why the test set is held out *before* any learning happens.",
+    flow: {
+      title: "Why you split the data first",
+      stages: [
+        { icon: "📚", label: "All data", d: "Start with every labelled example you have." },
+        { icon: "✂️", label: "Split", d: "Randomly seal ~20–25% as a **test set**; keep the rest for training." },
+        { icon: "✍️", label: "Train on the rest", d: "The model only ever learns from the training portion." },
+        { icon: "📝", label: "Test on the sealed set", d: "Score it on the unseen test set — your honest estimate of real-world accuracy." }
+      ]
+    },
     prerequisites: ["ml-fundamentals"],
     plainWords: "You must judge a model on data it never saw during training — otherwise you're grading it on the answers it memorised. So you hold out a test set before training anything.",
     actuallyDoes: "Randomly partitions data into train and test (and often validation) subsets so the reported score estimates real-world, unseen performance.",
@@ -811,6 +835,18 @@ window.ENRICH = {
 
   /* ---------- Generative AI ---------- */
   "generative-ai-llm": {
+    analogy: "Like a **very well-read intern doing super-charged autocomplete**. It has read a huge slice of the internet and, given some text, predicts the next word over and over — fluently enough to write essays, code and answers. It doesn't 'look up' facts; it predicts what a knowledgeable person would most likely say next.",
+    flow: {
+      title: "How an LLM turns your prompt into an answer",
+      stages: [
+        { icon: "✍️", label: "Text", d: "Your prompt arrives as plain text." },
+        { icon: "🔡", label: "Tokens", d: "It's chopped into **tokens** — word-pieces the model actually works with." },
+        { icon: "📍", label: "Embeddings", d: "Each token becomes a vector capturing its meaning and position." },
+        { icon: "🧠", label: "Transformer", d: "Attention layers weigh how every token relates to the others to build context." },
+        { icon: "🎲", label: "Next token", d: "It predicts the most likely next token, appends it, and repeats." },
+        { icon: "📝", label: "Answer", d: "Token by token the reply is generated — which is why it 'types' one word at a time." }
+      ]
+    },
     prerequisites: ["neural-networks"],
     plainWords: "An LLM is a giant next-token predictor trained on huge text. Ask it something and it repeatedly guesses the most plausible next chunk of text — that simple objective, at scale, produces fluent answers.",
     actuallyDoes: "Predicts the probability of the next token given all previous ones; sampling from that distribution repeatedly generates coherent text.",
@@ -827,6 +863,7 @@ window.ENRICH = {
     }
   },
   "prompt-engineering": {
+    analogy: "Like giving instructions to a **brilliant but painfully literal assistant**. It does exactly what you say, not what you meant — so vague asks get vague work. Say who it is, what you want, the format, and show one example, and the same model suddenly produces exactly what you need.",
     prerequisites: ["generative-ai-llm"],
     plainWords: "The prompt is your program for an LLM. Clear instructions, examples, and a defined output format dramatically change the quality — same model, wildly different results depending on how you ask.",
     actuallyDoes: "Shapes the model's output distribution by conditioning it: role, constraints, few-shot examples and format cues steer generation toward the answer you want.",
@@ -843,6 +880,7 @@ window.ENRICH = {
     }
   },
   "vector-search": {
+    analogy: "Like a **librarian who finds books by vibe, not exact title**. Ask for 'something about getting my money back' and keyword search shrugs; meaning-based search hands you the refund policy. It matches by *what the text means* — using the embedding vectors — not by the letters.",
     prerequisites: ["tokens-embeddings"],
     plainWords: "Vector search finds items by meaning, not keywords: embed everything into vectors, then return the ones closest to your query's vector. It's what powers semantic search and the retrieval step in RAG.",
     actuallyDoes: "Indexes embedding vectors and answers nearest-neighbour queries by cosine/inner-product similarity, often approximately for speed at scale.",
@@ -859,6 +897,7 @@ window.ENRICH = {
     }
   },
   "rag-vs-finetuning": {
+    analogy: "**Look it up vs learn it by heart.** RAG hands the model an open reference to read at answer time — great for facts that change or must be cited. Fine-tuning makes it study until a behaviour is second nature — great for a fixed style or format, not for fresh facts. Changing knowledge? Reach for RAG.",
     prerequisites: ["rag"],
     plainWords: "Two ways to give an LLM new abilities: RAG feeds facts at query time (great for changing/private knowledge), fine-tuning bakes behaviour into the weights (great for fixed style or format). They solve different problems.",
     actuallyDoes: "RAG augments the prompt with retrieved context (no weight change); fine-tuning updates weights on curated examples. Choose by whether you're adding knowledge or shaping behaviour.",
