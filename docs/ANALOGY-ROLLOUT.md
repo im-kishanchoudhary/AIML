@@ -58,46 +58,33 @@ Legend: ✅ done · ⬜ pending · **Flow** = gets an interactive flow strip.
 | normal-distribution | The bell curve of heights in a population | — | ✅ |
 | probability-basics | A weather forecast's "70% chance" | — | ✅ |
 
-## Batch 4 — NumPy, Pandas, Visualization (pending)
+## Batch 4 — NumPy, Pandas, Visualization, ML, DL, MLOps (done)
 
 | Topic | Analogy hook | Flow | Status |
 |-------|--------------|------|--------|
-| numpy-ndarray | An egg carton of identical cells the computer reads instantly | — | ⬜ |
-| numpy-vectorization | A photocopier vs writing each page by hand | — | ⬜ |
-| pandas-dataframe | A spreadsheet you drive with code | — | ⬜ |
-| pandas-loading | Importing a spreadsheet into your workspace | — | ⬜ |
-| pandas-cleaning | Tidying a messy desk before you start work | Flow | ⬜ |
-| pandas-transform | Rearranging the furniture — same stuff, new layout | — | ⬜ |
-| matplotlib | Drawing a chart by giving step-by-step instructions | — | ⬜ |
-| choosing-a-chart | Right tool for the message — bar vs line vs scatter | — | ⬜ |
+| numpy-ndarray | An egg carton of identical cells the computer reads instantly | — | ✅ |
+| numpy-vectorization | A photocopier vs writing each page by hand | — | ✅ |
+| pandas-dataframe | A spreadsheet you drive with code | — | ✅ |
+| pandas-loading | Importing a spreadsheet into your workspace | — | ✅ |
+| pandas-cleaning | Tidying a messy desk before you start work | ✅ | ✅ |
+| pandas-transform | Rearranging the furniture — same stuff, new layout | — | ✅ |
+| matplotlib | Drawing a chart by giving step-by-step instructions | — | ✅ |
+| choosing-a-chart | Right tool for the message — bar vs line vs scatter | — | ✅ |
+| hyperparameter-tuning | Dialling in an oven for the best bake | — | ✅ |
+| sklearn-workflow | One recipe (fit → predict) for every dish | ✅ | ✅ |
+| activation-loss | A dimmer switch (activation) + a scorecard (loss) | — | ✅ |
+| ai-applications | Wiring the model into a product like any other API | — | ✅ |
+| mlops-lifecycle | Running the restaurant after opening night — keep it fresh | ✅ | ✅ |
+| mlops-monitoring | Dashboard warning lights / a smoke detector | — | ✅ |
 
-## Batch 5 — Machine Learning (pending)
+**All 45 topics done.** 🎉 11 flows in total.
 
-| Topic | Analogy hook | Flow | Status |
-|-------|--------------|------|--------|
-| hyperparameter-tuning | Tuning the dials on an oven for the best bake | — | ⬜ |
-| sklearn-workflow | The same recipe steps for any dish | Flow | ⬜ |
-
-## Batch 6 — Deep Learning & GenAI (pending)
-
-| Topic | Analogy hook | Flow | Status |
-|-------|--------------|------|--------|
-| activation-loss | A dimmer switch (activation) + a scorecard (loss) | — | ⬜ |
-| ai-applications | Wiring the model into a product like any other API | — | ⬜ |
-
-## Batch 7 — MLOps (pending)
-
-| Topic | Analogy hook | Flow | Status |
-|-------|--------------|------|--------|
-| mlops-lifecycle | Running the restaurant after opening night — keep it fresh | Flow | ⬜ |
-| mlops-monitoring | Dashboard warning lights / a smoke detector | — | ⬜ |
-
-## Batch 8 — Glossary (pending)
+## Batch 5 — Glossary (pending)
 
 All 37 glossary terms get a one-line real-world analogy appended to their
 definition. Batched last, after the topic pages land.
 
 ---
 
-**Progress:** 31 / 45 topics · 0 / 37 glossary terms. Remaining: 14 topics
-(NumPy/Pandas/Viz 8, ML 2, DL & GenAI 2, MLOps 2) + glossary.
+**Progress:** 45 / 45 topics ✅ · 0 / 37 glossary terms. Only the glossary
+batch remains.

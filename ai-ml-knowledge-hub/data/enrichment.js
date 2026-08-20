@@ -306,6 +306,7 @@ window.ENRICH = {
 
   /* ---------- NumPy ---------- */
   "numpy-ndarray": {
+    analogy: "Like an **egg carton** — a rigid grid of same-sized cells the computer reads in one sweep. Because every cell holds the same type packed tightly together, math over millions of numbers runs at C speed, not slow Python-loop speed.",
     prerequisites: ["python-data-structures"],
     plainWords: "A NumPy array is like a Python list that's all one type and stored in a tight block of memory, so maths on millions of numbers runs at C speed instead of slow Python loops.",
     actuallyDoes: "Holds numbers in a contiguous typed buffer with a shape; operations run in compiled code over the whole buffer at once.",
@@ -322,6 +323,7 @@ window.ENRICH = {
     }
   },
   "numpy-vectorization": {
+    analogy: "Like a **photocopier vs writing each page by hand**. A Python loop handles one number at a time; a vectorized NumPy operation runs the whole batch in one machine-level stroke. Same result, often 10–100× faster — and shorter code.",
     prerequisites: ["numpy-ndarray"],
     plainWords: "Vectorization means expressing a calculation over a whole array at once instead of looping element by element — shorter to write and often 10–100× faster. Broadcasting lets arrays of different shapes combine sensibly.",
     actuallyDoes: "Pushes the loop down into compiled C, and 'stretches' smaller arrays across larger ones (broadcasting) so you avoid explicit Python iteration.",
@@ -340,6 +342,7 @@ window.ENRICH = {
 
   /* ---------- Pandas ---------- */
   "pandas-dataframe": {
+    analogy: "Like a **spreadsheet you drive with code instead of a mouse**. Same rows and columns you know from Excel, but you filter, join and transform millions of rows with one line — repeatably, with no manual clicking.",
     prerequisites: ["numpy-ndarray"],
     plainWords: "A DataFrame is a spreadsheet in code: labelled columns, an index for rows, each column a NumPy array. A Series is a single column. It's the table every data project revolves around.",
     actuallyDoes: "Wraps typed columnar arrays with row/column labels and alignment, so selecting, filtering and combining tabular data becomes concise and safe.",
@@ -356,6 +359,7 @@ window.ENRICH = {
     }
   },
   "pandas-loading": {
+    analogy: "Like **opening a spreadsheet into your workspace**. `read_csv` (or read_excel / read_sql) pulls a file or database table straight into a DataFrame so you can start working — the very first step of almost every data project.",
     prerequisites: ["pandas-dataframe"],
     plainWords: "Real data lives in CSVs, Excel and databases. `read_csv` pulls it in, and a few one-liners (`head`, `info`, `describe`) tell you instantly what you're dealing with before you touch it.",
     actuallyDoes: "Parses external files into a DataFrame, inferring types, then summarises shape, dtypes, missing counts and basic statistics.",
@@ -372,6 +376,17 @@ window.ENRICH = {
     }
   },
   "pandas-cleaning": {
+    analogy: "Like **tidying a messy desk before you start work**. Real data arrives with gaps, wrong types and duplicates — you can't analyse a mess. Cleaning is the unglamorous 80% that makes the insightful 20% possible.",
+    flow: {
+      title: "A cleaning pass",
+      stages: [
+        { icon: "🔍", label: "Inspect", d: "Look first: `.info()`, `.describe()`, `.isna().sum()` — where are the problems?" },
+        { icon: "🕳️", label: "Handle missing", d: "Fill, drop, or flag empty cells depending on *why* they're missing." },
+        { icon: "🔢", label: "Fix types", d: "Turn 'text that should be numbers or dates' into real numbers and datetimes." },
+        { icon: "🧹", label: "Deduplicate", d: "Remove duplicate rows and standardise messy categories ('NY' vs 'New York')." },
+        { icon: "✅", label: "Verify", d: "Re-check: no NaNs where they matter, ranges look sane. Now you can analyse." }
+      ]
+    },
     prerequisites: ["pandas-loading"],
     plainWords: "Raw data is messy: blanks, duplicates, wrong types, stray whitespace. Cleaning is fixing those so the numbers you compute later actually mean something — the least glamorous, most important step.",
     actuallyDoes: "Detects and resolves missing values (drop/fill), removes duplicates, fixes dtypes and normalises text, producing a trustworthy table.",
@@ -388,6 +403,7 @@ window.ENRICH = {
     }
   },
   "pandas-transform": {
+    analogy: "Like **rearranging the furniture — same stuff, new layout**. Group, pivot, melt and merge reshape the *same* data into whatever form the question needs — long to wide, many rows into one summary — without changing the underlying facts.",
     prerequisites: ["pandas-cleaning"],
     plainWords: "Once clean, you reshape and summarise: group rows and aggregate them, make new columns, pivot. This is where a table starts answering questions ('average spend per city?').",
     actuallyDoes: "Applies split-apply-combine (groupby), vectorized column math and reshaping so you can compute summaries and features directly on the table.",
@@ -406,6 +422,7 @@ window.ENRICH = {
 
   /* ---------- Visualization ---------- */
   "matplotlib": {
+    analogy: "Like **drawing a chart by giving step-by-step instructions** — 'axis here, this line, that label' — rather than clicking a chart wizard. More effort up front, but total control and a picture you can regenerate the instant the data changes.",
     prerequisites: ["numpy-ndarray"],
     plainWords: "Matplotlib is Python's core plotting library — the thing that actually draws the line, bar and scatter charts. Most other plotting tools are built on top of it.",
     actuallyDoes: "Maps arrays of numbers to figures and axes you can style and export; the figure/axes objects give fine control over every element.",
@@ -422,6 +439,7 @@ window.ENRICH = {
     }
   },
   "choosing-a-chart": {
+    analogy: "Like **picking the right tool for the message**. A bar chart compares categories, a line shows change over time, a scatter reveals a relationship. The wrong chart hides the story; matching the chart to the question makes it obvious.",
     prerequisites: ["matplotlib"],
     plainWords: "The chart type should match the question: comparison → bars, trend over time → line, distribution → histogram, relationship → scatter. Pick wrong and you hide the story or mislead.",
     actuallyDoes: "Maps a data question to the encoding (position, length, angle) that human eyes read most accurately, so the reader's takeaway matches the data.",
@@ -654,6 +672,7 @@ window.ENRICH = {
     }
   },
   "hyperparameter-tuning": {
+    analogy: "Like **dialling in an oven for the best bake**. The recipe (the algorithm) is fixed, but temperature and time (the hyperparameters) change the result. You try combinations and keep the settings that come out best on unseen data.",
     prerequisites: ["overfitting", "train-test-split"],
     plainWords: "Hyperparameters are the knobs you set before training (tree depth, regularization strength, k). Tuning searches combinations to find the settings that generalise best — judged by cross-validation, not the test set.",
     actuallyDoes: "Systematically evaluates knob settings with cross-validation and keeps the combination with the best validated score, avoiding manual guesswork and test-set leakage.",
@@ -670,6 +689,17 @@ window.ENRICH = {
     }
   },
   "sklearn-workflow": {
+    analogy: "Like **one recipe that works for every dish**. Whatever the model, scikit-learn uses the same steps — `fit`, then `predict` / `transform` — so once you learn the pattern you can swap a random forest for a logistic regression by changing a single line.",
+    flow: {
+      title: "The scikit-learn pattern",
+      stages: [
+        { icon: "🍳", label: "Choose", d: "Pick an estimator — `RandomForestClassifier`, `LinearRegression`, whatever fits the task." },
+        { icon: "📐", label: "fit", d: "`model.fit(X_train, y_train)` — learn the pattern from training data." },
+        { icon: "🔮", label: "predict", d: "`model.predict(X_new)` — apply what it learned to new rows." },
+        { icon: "📊", label: "score", d: "`model.score(...)` or a metric — measure how well it did on held-out data." },
+        { icon: "🔁", label: "Swap freely", d: "Same four steps for every model, so experimenting costs one line." }
+      ]
+    },
     prerequisites: ["ml-fundamentals", "train-test-split"],
     plainWords: "scikit-learn gives every model the same three verbs: fit, predict, score. Learn the pattern once and you can swap algorithms freely. Pipelines chain preprocessing + model so nothing leaks.",
     actuallyDoes: "Exposes a uniform estimator API and Pipeline objects that bundle transformers and a model, so preprocessing is fit only on training folds.",
@@ -795,6 +825,7 @@ window.ENRICH = {
     }
   },
   "activation-loss": {
+    analogy: "Like a **dimmer switch plus a scorecard**. The *activation function* is a dimmer on each neuron — it decides how much signal passes and lets the network learn curves, not just straight lines. The *loss function* is the scorecard — one number saying how wrong the output was, which training then works to shrink.",
     prerequisites: ["neural-networks"],
     plainWords: "Activation functions add the non-linearity that lets deep nets model complex things (without them, stacked layers collapse to one line). The loss function scores how wrong a prediction is — the thing training tries to shrink.",
     actuallyDoes: "Activations (ReLU, sigmoid, softmax) bend the function; the loss (MSE, cross-entropy) turns error into a single number whose gradient drives learning.",
@@ -936,6 +967,7 @@ window.ENRICH = {
     }
   },
   "ai-applications": {
+    analogy: "Like **wiring the model into a product the same way you'd call any API**. Once trained, a model is just a function behind an endpoint: your app sends inputs, gets a prediction, and ordinary software (validation, storage, UI) does the rest. The ML is one component, not the whole system.",
     prerequisites: ["rag", "prompt-engineering"],
     plainWords: "Beyond chat, LLMs power agents that use tools: they decide what to do, call a function (search, calculator, API), read the result, and continue. The model is the reasoner; tools give it real-world reach.",
     actuallyDoes: "Wraps an LLM in a loop that parses its requested action, executes a tool, feeds the result back, and repeats until the task is done.",
@@ -954,6 +986,17 @@ window.ENRICH = {
 
   /* ---------- MLOps ---------- */
   "mlops-lifecycle": {
+    analogy: "Like **running the restaurant after opening night** — shipping the model is the launch, not the finish. The world drifts, tastes change, ingredients vary, so you keep watching, refreshing and re-cooking to stay good over time.",
+    flow: {
+      title: "The MLOps loop",
+      stages: [
+        { icon: "📦", label: "Deploy", d: "Put the trained model behind an API so the product can use it." },
+        { icon: "📡", label: "Monitor", d: "Watch its predictions and inputs in the wild — accuracy, latency, data drift." },
+        { icon: "⚠️", label: "Detect drift", d: "The world changes; flag when incoming data or performance moves away from training." },
+        { icon: "🔄", label: "Retrain", d: "Refresh the model on newer data when it starts to slip." },
+        { icon: "🚀", label: "Redeploy", d: "Ship the updated model — and the loop begins again." }
+      ]
+    },
     prerequisites: ["sklearn-workflow", "model-evaluation"],
     plainWords: "MLOps is DevOps for models: version the data and model, automate training, deploy, monitor, and retrain when things drift. A model isn't 'done' at good accuracy — that's when the real work starts.",
     actuallyDoes: "Coordinates data/model versioning, reproducible pipelines, deployment and monitoring so a model stays reliable and auditable across its life.",
@@ -970,6 +1013,7 @@ window.ENRICH = {
     }
   },
   "mlops-monitoring": {
+    analogy: "Like the **warning lights on a car dashboard** — or a smoke detector. You don't stare at the engine all day; you get alerted the moment accuracy, latency or input data drifts out of range, so you fix a small problem before it becomes an outage.",
     prerequisites: ["mlops-lifecycle"],
     plainWords: "After deploy, the world keeps changing. Data drift is when live inputs no longer look like the training data, silently eroding accuracy. Monitoring catches it so you can retrain before users notice.",
     actuallyDoes: "Compares live input distributions against a training reference (via statistical tests/distances) and alerts when drift exceeds a threshold, triggering retraining.",
