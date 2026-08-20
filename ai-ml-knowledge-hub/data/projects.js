@@ -188,11 +188,36 @@ window.PROJECTS = [
     dataset: "A synthetic customer table generated locally in step 2 — nothing to download. Swap in your own CSV later.",
     outcome: "A saved churn_model.joblib you can reload anywhere, a prediction on a new customer, and an HTTP endpoint that scores customers — all served from your machine.",
     stack: ["Python 3.10+", "scikit-learn", "joblib", "FastAPI (optional)"],
+    story: "Picture the whole build as **raising, testing, graduating and then hiring a human expert** — a *churn coach* who learns to spot which customers are about to leave. Each step below is one stage in that story, and each stage maps to one specific line of code.",
+    lifecycle: [
+      { icon: "📖", label: "Write the textbook", sub: "make the data", to: 1 },
+      { icon: "✍️", label: "Study", sub: "model.fit() — training", to: 2 },
+      { icon: "📝", label: "Sit the exam", sub: "evaluate honestly", to: 3 },
+      { icon: "🎓", label: "Graduate", sub: "save the model", to: 4 },
+      { icon: "🧑‍🏫", label: "Answer a question", sub: "predict for a customer", to: 5 },
+      { icon: "🏢", label: "Open the office", sub: "serve over HTTP", to: 6 }
+    ],
+    concept: {
+      q: "How can we say we “trained a model”?",
+      a: "It comes down to a single line — **model.fit(X_tr, y_tr)** in the *Split, then train* step. Before that line runs you have an empty, know-nothing algorithm. After it, you have something that has absorbed the patterns in 900 worked examples and can judge customers it has **never seen**. That one line is the exact moment “training” happens — everything before it prepares the lesson, everything after it puts what was learned to work."
+    },
+    capabilities: [
+      "Returns a **churn-risk score** (0–1) for any customer from just 4 inputs",
+      "Turns that score into a **business action** — `retention outreach` vs `no action`",
+      "Runs in **milliseconds, offline, on your CPU** — no cloud, no API cost",
+      "Ships as **one ~6 MB file** and can serve a whole company over HTTP"
+    ],
+    limitations: [
+      "It is trained on **synthetic, made-up customers** and only 4 features",
+      "So it is a **correct demo of the technique, not a production tool**",
+      "Swap step 2's fake data for **real customer records** and the other five steps become genuinely useful — unchanged"
+    ],
     steps: [
       {
         title: "Set up a local Python environment",
         topic: "sklearn-workflow",
         detail: "A CPU is all you need for classic ML — no GPU required. Create an isolated environment so versions stay reproducible, then install the libraries.",
+        analogy: "**Set up the classroom.** Before any teaching happens you prepare a clean, private room (the virtual environment) and put the right books on the shelf (the libraries). Nothing is learned yet — you're just making a tidy, repeatable place to work.",
         code: "# Create an isolated environment (pick ONE)\n# --- conda ---\nconda create -n ai-lab python=3.11 -y\nconda activate ai-lab\n# --- or venv ---\npython -m venv .venv\n# Windows: .venv\\Scripts\\activate   macOS/Linux: source .venv/bin/activate\n\n# Install (CPU-only, no GPU needed)\npip install scikit-learn pandas numpy joblib\n\n# Verify\npython -c \"import sklearn; print('env ready', sklearn.__version__)\"",
         checkpoint: "`env ready` prints with a scikit-learn version — your local ML sandbox is live."
       },
@@ -200,6 +225,7 @@ window.PROJECTS = [
         title: "Generate a dataset locally",
         topic: "pandas-dataframe",
         detail: "So the whole project runs offline, synthesise a customer table. Each row is a customer; `churn` (1 = left) is what we'll predict.",
+        analogy: "**Write the textbook — and its answer key.** Every row is a practice problem (the customer's details) with the answer already filled in (`churn` = did they leave?). Still nothing is learned; you're creating the material the student will study from.",
         code: "import numpy as np, pandas as pd\nrng = np.random.default_rng(0)\nn = 1200\ndf = pd.DataFrame({\n  'tenure_months': rng.integers(1, 72, n),\n  'monthly_charge': rng.normal(70, 25, n).round(2),\n  'support_calls': rng.poisson(1.5, n),\n  'is_month_to_month': rng.integers(0, 2, n),\n})\nrisk = df.is_month_to_month*1.2 + df.support_calls*0.4 - df.tenure_months*0.04\ndf['churn'] = (rng.random(n) < 1/(1+np.exp(-risk+1))).astype(int)\nprint(df.head()); print('churn rate:', df.churn.mean().round(3))",
         checkpoint: "A 1,200-row table prints with a churn rate around 0.35–0.45."
       },
@@ -207,6 +233,7 @@ window.PROJECTS = [
         title: "Split, then train on your CPU",
         topic: "train-test-split",
         detail: "Hold out a test set first — your only honest read on real-world accuracy. Then train a Random Forest, a strong baseline that needs no scaling. `n_jobs=-1` uses every CPU core.",
+        analogy: "**The student studies.** You hand over 900 solved examples to learn from and hide 300 for a later exam. The line `model.fit(X_tr, y_tr)` **is the studying** — this is the exact moment \"we trained a model\" literally happens.",
         code: "from sklearn.model_selection import train_test_split\nfrom sklearn.ensemble import RandomForestClassifier\nfeatures = ['tenure_months','monthly_charge','support_calls','is_month_to_month']\nX, y = df[features], df['churn']\nX_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.25, stratify=y, random_state=0)\nmodel = RandomForestClassifier(n_estimators=200, random_state=0, n_jobs=-1)\nmodel.fit(X_tr, y_tr)\nprint('trained on', X_tr.shape[0], 'rows using your CPU')",
         checkpoint: "It prints the training row count — the forest is fit locally in a second or two."
       },
@@ -214,6 +241,7 @@ window.PROJECTS = [
         title: "Evaluate honestly",
         topic: "model-evaluation",
         detail: "Accuracy alone lies on imbalanced data. Read ROC-AUC and the full precision/recall report on the held-out test set.",
+        analogy: "**Exam day — on questions never seen.** You test the coach on the 300 hidden examples. A high score proves it learned real patterns instead of just memorising the workbook (that failure has a name: *overfitting*).",
         code: "from sklearn.metrics import roc_auc_score, classification_report\nproba = model.predict_proba(X_te)[:, 1]\nprint('ROC-AUC:', round(roc_auc_score(y_te, proba), 3))\nprint(classification_report(y_te, (proba > 0.5).astype(int)))",
         checkpoint: "ROC-AUC around 0.78–0.85 — clearly better than 0.5 (random guessing)."
       },
@@ -221,6 +249,7 @@ window.PROJECTS = [
         title: "Save the model to disk",
         topic: "mlops-lifecycle",
         detail: "A trained model is just an object — persist it so you never retrain to reuse it. joblib is the scikit-learn standard for this.",
+        analogy: "**Graduation — the diploma.** `joblib.dump()` freezes the trained brain into one portable file. You never re-teach it: email it, ship it, or load it on any machine and the expertise is intact.",
         code: "import joblib\njoblib.dump(model, 'churn_model.joblib')\nprint('saved churn_model.joblib')\n# this file is a portable artifact — commit it, ship it, or load it on another machine",
         checkpoint: "A `churn_model.joblib` file appears in your folder."
       },
@@ -228,6 +257,7 @@ window.PROJECTS = [
         title: "Load it and use it on a new customer",
         topic: "sklearn-workflow",
         detail: "This is the payoff: reload the saved model in a fresh process and score input it has never seen — exactly what a real application does at inference time.",
+        analogy: "**Hiring the coach for one question.** A brand-new customer walks up and the model instantly answers *\"83% likely to leave → call them.\"* This is the \"what's 2 + 2? → 4\" moment: knowledge applied on demand.",
         code: "import joblib, pandas as pd\nclf = joblib.load('churn_model.joblib')\nnew_customer = pd.DataFrame([{\n  'tenure_months': 3, 'monthly_charge': 95.0,\n  'support_calls': 4, 'is_month_to_month': 1,\n}])\np = float(clf.predict_proba(new_customer)[0, 1])\nprint('churn probability:', round(p, 3))\nprint('decision:', 'RETENTION OUTREACH' if p > 0.5 else 'no action')",
         checkpoint: "A churn probability prints for the new customer, with a decision — you're using the model."
       },
@@ -235,6 +265,7 @@ window.PROJECTS = [
         title: "Serve it locally over HTTP (optional)",
         topic: "mlops-lifecycle",
         detail: "Wrap the model in a tiny FastAPI service on localhost so any app on your machine can call it — the same shape as a production model API, minus the cloud.",
+        analogy: "**Open a coaching office with a phone line.** The FastAPI `/predict` endpoint means any app, website, or teammate can ring up 24/7 and get a prediction back — the same expert, now available to everyone at once.",
         code: "# pip install fastapi uvicorn\n# save as serve.py, then run:  uvicorn serve:app --port 8000\nfrom fastapi import FastAPI\nfrom pydantic import BaseModel\nimport joblib, pandas as pd\napp = FastAPI()\nclf = joblib.load('churn_model.joblib')\nclass Customer(BaseModel):\n    tenure_months: int\n    monthly_charge: float\n    support_calls: int\n    is_month_to_month: int\n@app.post('/predict')\ndef predict(c: Customer):\n    x = pd.DataFrame([c.model_dump()])\n    p = float(clf.predict_proba(x)[0, 1])\n    return {'churn_probability': round(p, 3), 'action': 'outreach' if p > 0.5 else 'none'}",
         checkpoint: "Open http://127.0.0.1:8000/docs, POST a customer, and get a JSON churn score back — served entirely from your machine."
       }

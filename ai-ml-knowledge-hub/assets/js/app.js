@@ -961,6 +961,40 @@
     content.innerHTML = h; content.scrollTop = 0;
     renderSidebar();
   }
+  // Optional "explain it simply" blocks — rendered only when a project defines them.
+  function projStoryHtml(p) {
+    var h = "";
+    if (p.story) h += '<div class="proj-story"><span class="pst-ico">' + ICONS.bulb + "</span><div>" + md(p.story) + "</div></div>";
+    if (p.lifecycle && p.lifecycle.length) {
+      var stages = p.lifecycle.map(function (s, i) {
+        return '<button class="lc-stage" data-to="' + (s.to != null ? s.to : i) + '">' +
+          '<span class="lc-ico">' + esc(s.icon || "•") + "</span>" +
+          '<span class="lc-label">' + esc(s.label) + "</span>" +
+          '<span class="lc-sub">' + esc(s.sub || "") + "</span></button>";
+      }).join('<span class="lc-arrow">' + ICONS.arrow.replace('width="20" height="20"', 'width="16" height="16"') + "</span>");
+      h += '<div class="lifecycle-wrap"><div class="lifecycle-k">The build as one story — click a stage to jump to it</div>' +
+        '<div class="lifecycle">' + stages + "</div></div>";
+    }
+    return h;
+  }
+  function conceptBoxHtml(p) {
+    if (!p.concept) return "";
+    return '<div class="concept-box"><div class="concept-q"><span class="concept-badge">Key idea</span>' + md(p.concept.q) +
+      '</div><div class="concept-a">' + md(p.concept.a) + "</div></div>";
+  }
+  function projExtrasHtml(p) {
+    var h = "";
+    if (p.capabilities && p.capabilities.length) {
+      h += '<div class="sec"><h2>What this model can do</h2><div class="cap-grid">' +
+        p.capabilities.map(function (c) { return '<div class="cap-cell"><span class="cap-ico">' + ICONS.check.replace('width="20" height="20"', 'width="16" height="16"') + "</span><div>" + md(c) + "</div></div>"; }).join("") +
+        "</div></div>";
+    }
+    if (p.limitations && p.limitations.length) {
+      h += '<div class="sec"><h2>Honest limits — what it is <em>not</em></h2>' + listBlock(p.limitations, "bad") + "</div>";
+    }
+    return h;
+  }
+
   function renderProject(id) {
     var p = PROJECT_BY_ID[id];
     if (!p) { renderProjects(); return; }
@@ -971,12 +1005,16 @@
       '<span class="tag tag-outline">' + total + ' steps</span>' + (p.stack || []).map(function (s) { return '<span class="tag tag-neutral">' + esc(s) + "</span>"; }).join("") + "</div>" +
       "<h1>" + esc(p.title) + '</h1><p class="short">' + esc(p.blurb) + "</p>";
     h += '<div class="path-progress-row"><div class="progress-track" style="max-width:320px"><div class="progress-fill" style="width:' + pct + '%"></div></div><span class="pc-pct">' + done + " / " + total + " steps</span></div></div>";
+    // plain-English framing + interactive lifecycle (optional)
+    h += projStoryHtml(p);
     // brief
     h += '<div class="proj-brief">';
     h += '<div class="pb-cell"><div class="pb-k">Goal</div><div class="pb-v">' + esc(p.goal) + "</div></div>";
     if (p.dataset) h += '<div class="pb-cell"><div class="pb-k">Data</div><div class="pb-v">' + esc(p.dataset) + "</div></div>";
     if (p.outcome) h += '<div class="pb-cell"><div class="pb-k">You\'ll end with</div><div class="pb-v">' + esc(p.outcome) + "</div></div>";
     h += "</div>";
+    // featured key-idea box (optional)
+    h += conceptBoxHtml(p);
     // steps
     h += '<div class="proj-steps">';
     (p.steps || []).forEach(function (s, i) {
@@ -987,17 +1025,27 @@
         (t ? '<a class="ps-topic" href="#t/' + s.topic + '">' + ICONS.bulb.replace('width="20" height="20"', 'width="13" height="13"') + " Concept: " + esc(t.title) + "</a>" : "") +
         "</div></div>";
       if (s.detail) h += '<div class="ps-detail">' + md(s.detail) + "</div>";
+      if (s.analogy) h += '<div class="ps-analogy"><span class="ps-analogy-k">In plain words</span> ' + md(s.analogy) + "</div>";
       if (s.code) h += '<div class="code-wrap"><div class="code-bar"><span class="code-lang">Python</span><button class="btn btn-secondary" data-copy type="button">Copy code</button></div><pre class="code"><code>' + highlightPy(s.code) + "</code></pre></div>";
       if (s.checkpoint) h += '<div class="ps-check"><span class="ps-check-k">' + ICONS.check.replace('width="20" height="20"', 'width="14" height="14"') + ' Checkpoint</span> ' + md(s.checkpoint) + "</div>";
       h += "</div>";
     });
     h += "</div>";
+    // capabilities + honest limits (optional)
+    h += projExtrasHtml(p);
     // completion
     h += '<div class="proj-done-banner' + (done === total && total ? " show" : "") + '">' + ICONS.check + " Project complete — you built it end to end. Try swapping in your own data next.</div>";
     h += "</div>";
     content.innerHTML = h; content.scrollTop = 0;
     Array.prototype.forEach.call(content.querySelectorAll(".proj-check"), function (b) {
       b.addEventListener("click", function () { toggleStep(p.id, parseInt(b.getAttribute("data-step"), 10)); renderProject(id); });
+    });
+    // lifecycle stage → jump to its step and flash it
+    Array.prototype.forEach.call(content.querySelectorAll(".lc-stage"), function (b) {
+      b.addEventListener("click", function () {
+        var el = document.getElementById("pstep-" + b.getAttribute("data-to"));
+        if (el) { content.scrollTop = el.offsetTop - 12; el.classList.add("flash"); setTimeout(function () { el.classList.remove("flash"); }, 1200); }
+      });
     });
     wireCopyButtons();
     renderSidebar();
