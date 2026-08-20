@@ -176,5 +176,216 @@ window.PROJECTS = [
         checkpoint: "The model's MAE is lower than the naive baseline's — it's earning its keep."
       }
     ]
+  },
+
+  /* ================= Local AI Lab — runs entirely on your own machine ================= */
+  {
+    id: "local-first-model",
+    title: "Train your first model on your machine",
+    level: "Beginner",
+    blurb: "Set up a local Python ML environment, train a scikit-learn model on your CPU, save it, then load it and use it to score new data — no cloud, no GPU.",
+    goal: "Stand up a reproducible local ML environment, train and honestly evaluate a classifier on your own CPU, persist it to disk, and call it on brand-new inputs from a tiny local service.",
+    dataset: "A synthetic customer table generated locally in step 2 — nothing to download. Swap in your own CSV later.",
+    outcome: "A saved churn_model.joblib you can reload anywhere, a prediction on a new customer, and an HTTP endpoint that scores customers — all served from your machine.",
+    stack: ["Python 3.10+", "scikit-learn", "joblib", "FastAPI (optional)"],
+    steps: [
+      {
+        title: "Set up a local Python environment",
+        topic: "sklearn-workflow",
+        detail: "A CPU is all you need for classic ML — no GPU required. Create an isolated environment so versions stay reproducible, then install the libraries.",
+        code: "# Create an isolated environment (pick ONE)\n# --- conda ---\nconda create -n ai-lab python=3.11 -y\nconda activate ai-lab\n# --- or venv ---\npython -m venv .venv\n# Windows: .venv\\Scripts\\activate   macOS/Linux: source .venv/bin/activate\n\n# Install (CPU-only, no GPU needed)\npip install scikit-learn pandas numpy joblib\n\n# Verify\npython -c \"import sklearn; print('env ready', sklearn.__version__)\"",
+        checkpoint: "`env ready` prints with a scikit-learn version — your local ML sandbox is live."
+      },
+      {
+        title: "Generate a dataset locally",
+        topic: "pandas-dataframe",
+        detail: "So the whole project runs offline, synthesise a customer table. Each row is a customer; `churn` (1 = left) is what we'll predict.",
+        code: "import numpy as np, pandas as pd\nrng = np.random.default_rng(0)\nn = 1200\ndf = pd.DataFrame({\n  'tenure_months': rng.integers(1, 72, n),\n  'monthly_charge': rng.normal(70, 25, n).round(2),\n  'support_calls': rng.poisson(1.5, n),\n  'is_month_to_month': rng.integers(0, 2, n),\n})\nrisk = df.is_month_to_month*1.2 + df.support_calls*0.4 - df.tenure_months*0.04\ndf['churn'] = (rng.random(n) < 1/(1+np.exp(-risk+1))).astype(int)\nprint(df.head()); print('churn rate:', df.churn.mean().round(3))",
+        checkpoint: "A 1,200-row table prints with a churn rate around 0.35–0.45."
+      },
+      {
+        title: "Split, then train on your CPU",
+        topic: "train-test-split",
+        detail: "Hold out a test set first — your only honest read on real-world accuracy. Then train a Random Forest, a strong baseline that needs no scaling. `n_jobs=-1` uses every CPU core.",
+        code: "from sklearn.model_selection import train_test_split\nfrom sklearn.ensemble import RandomForestClassifier\nfeatures = ['tenure_months','monthly_charge','support_calls','is_month_to_month']\nX, y = df[features], df['churn']\nX_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.25, stratify=y, random_state=0)\nmodel = RandomForestClassifier(n_estimators=200, random_state=0, n_jobs=-1)\nmodel.fit(X_tr, y_tr)\nprint('trained on', X_tr.shape[0], 'rows using your CPU')",
+        checkpoint: "It prints the training row count — the forest is fit locally in a second or two."
+      },
+      {
+        title: "Evaluate honestly",
+        topic: "model-evaluation",
+        detail: "Accuracy alone lies on imbalanced data. Read ROC-AUC and the full precision/recall report on the held-out test set.",
+        code: "from sklearn.metrics import roc_auc_score, classification_report\nproba = model.predict_proba(X_te)[:, 1]\nprint('ROC-AUC:', round(roc_auc_score(y_te, proba), 3))\nprint(classification_report(y_te, (proba > 0.5).astype(int)))",
+        checkpoint: "ROC-AUC around 0.78–0.85 — clearly better than 0.5 (random guessing)."
+      },
+      {
+        title: "Save the model to disk",
+        topic: "mlops-lifecycle",
+        detail: "A trained model is just an object — persist it so you never retrain to reuse it. joblib is the scikit-learn standard for this.",
+        code: "import joblib\njoblib.dump(model, 'churn_model.joblib')\nprint('saved churn_model.joblib')\n# this file is a portable artifact — commit it, ship it, or load it on another machine",
+        checkpoint: "A `churn_model.joblib` file appears in your folder."
+      },
+      {
+        title: "Load it and use it on a new customer",
+        topic: "sklearn-workflow",
+        detail: "This is the payoff: reload the saved model in a fresh process and score input it has never seen — exactly what a real application does at inference time.",
+        code: "import joblib, pandas as pd\nclf = joblib.load('churn_model.joblib')\nnew_customer = pd.DataFrame([{\n  'tenure_months': 3, 'monthly_charge': 95.0,\n  'support_calls': 4, 'is_month_to_month': 1,\n}])\np = float(clf.predict_proba(new_customer)[0, 1])\nprint('churn probability:', round(p, 3))\nprint('decision:', 'RETENTION OUTREACH' if p > 0.5 else 'no action')",
+        checkpoint: "A churn probability prints for the new customer, with a decision — you're using the model."
+      },
+      {
+        title: "Serve it locally over HTTP (optional)",
+        topic: "mlops-lifecycle",
+        detail: "Wrap the model in a tiny FastAPI service on localhost so any app on your machine can call it — the same shape as a production model API, minus the cloud.",
+        code: "# pip install fastapi uvicorn\n# save as serve.py, then run:  uvicorn serve:app --port 8000\nfrom fastapi import FastAPI\nfrom pydantic import BaseModel\nimport joblib, pandas as pd\napp = FastAPI()\nclf = joblib.load('churn_model.joblib')\nclass Customer(BaseModel):\n    tenure_months: int\n    monthly_charge: float\n    support_calls: int\n    is_month_to_month: int\n@app.post('/predict')\ndef predict(c: Customer):\n    x = pd.DataFrame([c.model_dump()])\n    p = float(clf.predict_proba(x)[0, 1])\n    return {'churn_probability': round(p, 3), 'action': 'outreach' if p > 0.5 else 'none'}",
+        checkpoint: "Open http://127.0.0.1:8000/docs, POST a customer, and get a JSON churn score back — served entirely from your machine."
+      }
+    ]
+  },
+  {
+    id: "local-rag",
+    title: "Local RAG with your own models",
+    level: "Intermediate",
+    blurb: "Run the whole retrieve-then-generate loop offline: a local embedding model for search and a local Ollama LLM for answers. Then fine-tune the embedder on your own data.",
+    goal: "Build RAG entirely on your own hardware — embed documents with a local sentence-transformers model, search them with a local index, generate grounded answers with a local LLM via Ollama, and fine-tune the embedder on your own pairs.",
+    dataset: "A few inline text chunks; point it at your own .txt / .md files once the loop works.",
+    outcome: "A fully offline RAG pipeline (no API keys, no data leaving your machine) plus a fine-tuned embedder tuned to your domain.",
+    stack: ["sentence-transformers", "numpy", "Ollama", "PyTorch (CPU or GPU)"],
+    steps: [
+      {
+        title: "Install the local stack",
+        topic: "rag",
+        detail: "Two pieces: sentence-transformers (pulls in PyTorch) for embeddings, and Ollama to run an LLM locally. The 3B model is ~2 GB, runs on CPU, and is much faster on a GPU.",
+        code: "# 1) Python libraries (sentence-transformers pulls in PyTorch)\npip install sentence-transformers numpy\n\n# 2) Install Ollama (runs LLMs locally): https://ollama.com/download\n#    then pull a small, fast model:\nollama pull llama3.2:3b\n\n# 3) Confirm it runs (Ollama serves on http://localhost:11434)\nollama run llama3.2:3b \"say hi in three words\"",
+        checkpoint: "The model replies in your terminal — an LLM is now running locally on your CPU/GPU."
+      },
+      {
+        title: "Load a local embedding model",
+        topic: "tokens-embeddings",
+        detail: "all-MiniLM-L6-v2 is ~90 MB, downloads once, then works fully offline. It maps text to 384-dim vectors and uses your GPU automatically if you have one.",
+        code: "from sentence_transformers import SentenceTransformer\nembedder = SentenceTransformer('all-MiniLM-L6-v2')\nprint('embedding dim:', embedder.get_sentence_embedding_dimension())  # 384",
+        checkpoint: "Prints 384 — your local embedder is ready (no network after the first download)."
+      },
+      {
+        title: "Chunk and embed your documents",
+        topic: "vector-search",
+        detail: "Retrieval works on small, self-contained pieces. Embed each chunk once and keep the matrix. Normalising the vectors lets a plain dot product act as cosine similarity.",
+        code: "import numpy as np\ndocs = [\n  'Refunds are available within 30 days of purchase with a receipt.',\n  'Support is available Monday to Friday, 9am to 6pm UK time.',\n  'The Pro plan includes unlimited projects and priority support.',\n  'All data is encrypted at rest and in transit using AES-256.',\n]\nemb = embedder.encode(docs, normalize_embeddings=True)\nemb = np.asarray(emb, dtype='float32')\nprint('index shape:', emb.shape)   # (4, 384)",
+        checkpoint: "(4, 384) prints — every chunk is now a local vector."
+      },
+      {
+        title: "Retrieve the relevant chunks",
+        topic: "vector-search",
+        detail: "Embed the question the same way and rank chunks by cosine similarity. Top-k are your evidence. For big corpora, swap the numpy dot for FAISS (`pip install faiss-cpu`).",
+        code: "def retrieve(question, k=2):\n    q = embedder.encode([question], normalize_embeddings=True)[0]\n    scores = emb @ np.asarray(q, dtype='float32')   # cosine (vectors normalized)\n    top = scores.argsort()[::-1][:k]\n    return [docs[i] for i in top]\n\nprint(retrieve('how many days do I have to return something?'))",
+        checkpoint: "The refund chunk comes back first — semantic search is working locally."
+      },
+      {
+        title: "Generate a grounded answer with the local LLM",
+        topic: "generative-ai-llm",
+        detail: "Put the retrieved context into the prompt and instruct the model to answer ONLY from it. The `ollama` package talks to your local server — nothing leaves the machine.",
+        code: "# pip install ollama\nimport ollama\n\ndef answer(question):\n    ctx = retrieve(question)\n    prompt = (\n        'Answer using ONLY the context. If it is not there, say you do not know.\\n\\n'\n        'Context:\\n- ' + '\\n- '.join(ctx) +\n        '\\n\\nQuestion: ' + question + '\\nAnswer:'\n    )\n    r = ollama.chat(model='llama3.2:3b',\n                    messages=[{'role': 'user', 'content': prompt}])\n    return r['message']['content']\n\nprint(answer('When is support open?'))",
+        checkpoint: "The model answers 'Monday to Friday, 9am to 6pm' — grounded in your retrieved chunk, generated on your machine."
+      },
+      {
+        title: "Fine-tune the embedder on your own pairs",
+        topic: "rag-vs-finetuning",
+        detail: "Retrieval sharpens when the embedder knows your domain. Fine-tune MiniLM on (question, answering-chunk) pairs with a contrastive loss — small enough to run on CPU, quick on GPU. This is the 'self-train' part.",
+        code: "from sentence_transformers import InputExample, losses\nfrom torch.utils.data import DataLoader\n\npairs = [\n  InputExample(texts=['how do I get my money back?', docs[0]]),\n  InputExample(texts=['what are your opening hours?', docs[1]]),\n  InputExample(texts=['what is in the paid tier?', docs[2]]),\n]\nloader = DataLoader(pairs, batch_size=3, shuffle=True)\nloss = losses.MultipleNegativesRankingLoss(embedder)\nembedder.fit(train_objectives=[(loader, loss)], epochs=3, warmup_steps=1)\nembedder.save('my-embedder')   # reload later: SentenceTransformer('my-embedder')\nprint('fine-tuned embedder saved to ./my-embedder')",
+        checkpoint: "Training runs 3 epochs and saves ./my-embedder — re-embed with it and retrieval gets sharper on your data."
+      }
+    ]
+  },
+  {
+    id: "custom-agent",
+    title: "Build a custom agent from scratch",
+    level: "Advanced",
+    blurb: "No frameworks. Define your own tools, prompt and reason–act loop, and let a local LLM drive tools — including the model you trained and your RAG retriever.",
+    goal: "Understand agents by building one from first principles: a tool registry, a controller loop, and JSON tool-calls parsed by hand — powered end-to-end by your own local models.",
+    dataset: "Reuses churn_model.joblib from 'Train your first model'. Runs against your local Ollama LLM.",
+    outcome: "A working reason→act→observe agent, about 60 lines you fully understand and can extend — running on local models only.",
+    stack: ["Python", "Ollama", "your saved model"],
+    steps: [
+      {
+        title: "Define your tools",
+        topic: "ai-applications",
+        detail: "A tool is just a Python function the model is allowed to call. Register a few in a dict — including a churn predictor backed by the model you trained in project 1.",
+        code: "import joblib, pandas as pd\nclf = joblib.load('churn_model.joblib')   # from 'Train your first model'\n\ndef predict_churn(tenure_months, monthly_charge, support_calls, is_month_to_month):\n    x = pd.DataFrame([dict(tenure_months=tenure_months, monthly_charge=monthly_charge,\n                           support_calls=support_calls, is_month_to_month=is_month_to_month)])\n    return round(float(clf.predict_proba(x)[0, 1]), 3)\n\ndef calculator(expression):\n    return eval(expression, {'__builtins__': {}}, {})   # arithmetic only, no builtins\n\nTOOLS = {'predict_churn': predict_churn, 'calculator': calculator}\nprint('registered tools:', list(TOOLS))",
+        checkpoint: "Two tools register; calling `predict_churn(2, 99, 5, 1)` returns a probability."
+      },
+      {
+        title: "Describe the tools to the model",
+        topic: "prompt-engineering",
+        detail: "The LLM needs a spec of each tool and a strict output contract. Tell it to reply with JSON only — either a tool call or a final answer.",
+        code: "TOOL_SPEC = '''\npredict_churn(tenure_months:int, monthly_charge:float, support_calls:int, is_month_to_month:int) -> float\ncalculator(expression:str) -> number\n'''\nSYSTEM = (\n    'You can call tools. To call one, reply with ONLY JSON:\\n'\n    '{\"tool\": \"<name>\", \"args\": {...}}\\n'\n    'When you have the final answer, reply with ONLY JSON:\\n'\n    '{\"answer\": \"<text>\"}\\n'\n    'Tools:\\n' + TOOL_SPEC\n)\nprint(SYSTEM)",
+        checkpoint: "The system prompt prints with the tool signatures and the JSON contract."
+      },
+      {
+        title: "Parse a tool call",
+        topic: "ai-applications",
+        detail: "Models wrap JSON in chatter. Pull out the first JSON object; if there isn't one, treat the whole reply as the answer.",
+        code: "import json, re\ndef parse(text):\n    m = re.search(r'\\{.*\\}', text, re.S)   # first JSON object\n    return json.loads(m.group(0)) if m else {'answer': text}\n\nprint(parse('sure! {\"tool\": \"calculator\", \"args\": {\"expression\": \"2+2\"}}'))",
+        checkpoint: "Prints {'tool': 'calculator', 'args': {'expression': '2+2'}} — parsing works."
+      },
+      {
+        title: "Write the reason–act loop",
+        topic: "generative-ai-llm",
+        detail: "The controller: send the conversation to the local LLM, parse its reply, run the tool it asks for, feed the observation back, and repeat until it answers or hits the step cap.",
+        code: "import ollama\n\ndef run(task, max_steps=5):\n    msgs = [{'role': 'system', 'content': SYSTEM},\n            {'role': 'user', 'content': task}]\n    for _ in range(max_steps):\n        out = ollama.chat(model='llama3.2:3b', messages=msgs)['message']['content']\n        step = parse(out)\n        if 'answer' in step:\n            return step['answer']\n        obs = TOOLS[step['tool']](**step.get('args', {}))      # ACT\n        print('  ->', step['tool'], step.get('args', {}), '=', obs)\n        msgs.append({'role': 'assistant', 'content': out})\n        msgs.append({'role': 'user', 'content': 'Observation: ' + str(obs)})\n    return 'stopped: max steps reached'\n\nprint(run('Customer: tenure 2, charge 99, 5 support calls, month-to-month. Is churn risk above 0.5?'))",
+        checkpoint: "The agent calls predict_churn, reads the score, and returns a yes/no answer — a loop you wrote, driven by a local model."
+      },
+      {
+        title: "Add guardrails and memory",
+        topic: "mlops-monitoring",
+        detail: "Real agents fail safely. Allowlist tool names, catch tool errors, and keep the step cap. Persist `msgs` across calls to give the agent conversational memory.",
+        code: "def safe_act(name, args):\n    if name not in TOOLS:\n        return 'error: unknown tool ' + str(name)\n    try:\n        return TOOLS[name](**args)\n    except Exception as e:\n        return 'error: ' + str(e)\n\n# In run(), replace TOOLS[step['tool']](...) with safe_act(step['tool'], step.get('args', {})).\n# Memory: keep the same `msgs` list between run() calls for multi-turn context.\nprint('guardrails: step cap + tool allowlist + error capture')",
+        checkpoint: "Unknown tools and bad arguments now return a handled error string instead of crashing the loop."
+      }
+    ]
+  },
+  {
+    id: "ollama-agent",
+    title: "Local agent with Ollama tool-calling",
+    level: "Advanced",
+    blurb: "Use Ollama's native function-calling so a local model can take real actions on your machine — read files, query your model, run allow-listed operations — safely.",
+    goal: "Let a local LLM decide and call real local actions through Ollama's structured tool API, with a path sandbox and human confirmation so it stays safe.",
+    dataset: "Acts on your local working folder and the churn model from project 1.",
+    outcome: "An agent that turns plain-English requests into real local actions via Ollama's built-in tool calling — fully offline, with safety rails.",
+    stack: ["Ollama", "ollama-python", "a tool-capable model (llama3.1 / qwen2.5)"],
+    steps: [
+      {
+        title: "Get a tool-capable local model",
+        topic: "generative-ai-llm",
+        detail: "Function calling needs a model trained for it. llama3.1:8b is a solid local choice; qwen2.5:3b is lighter if RAM is tight. Sizes below are rough RAM/VRAM needs.",
+        code: "# Tool-capable local models:\nollama pull llama3.1:8b     # ~4.7 GB, wants ~8 GB RAM/VRAM\n# lighter option:\nollama pull qwen2.5:3b      # ~2 GB\n\npip install ollama\nollama list                 # confirm it downloaded",
+        checkpoint: "`ollama list` shows a tool-capable model ready to use."
+      },
+      {
+        title: "Write real local action functions",
+        topic: "ai-applications",
+        detail: "These functions actually DO things on your machine. Sandbox every path to the working folder so the agent can't wander off it.",
+        code: "import os, joblib, pandas as pd\nALLOWED = os.path.abspath('.')\n\ndef _safe(name):\n    p = os.path.abspath(os.path.join(ALLOWED, name))\n    return p if p.startswith(ALLOWED) else None\n\ndef list_files(subdir='.'):\n    p = _safe(subdir)\n    return os.listdir(p) if p else 'blocked: outside working folder'\n\ndef read_file(name):\n    p = _safe(name)\n    if not p:\n        return 'blocked'\n    with open(p, encoding='utf-8') as f:\n        return f.read()[:2000]\n\n_clf = joblib.load('churn_model.joblib')\ndef churn_score(tenure_months, monthly_charge, support_calls, is_month_to_month):\n    x = pd.DataFrame([dict(tenure_months=tenure_months, monthly_charge=monthly_charge,\n                           support_calls=support_calls, is_month_to_month=is_month_to_month)])\n    return round(float(_clf.predict_proba(x)[0, 1]), 3)\n\nACTIONS = {'list_files': list_files, 'read_file': read_file, 'churn_score': churn_score}\nprint('actions ready:', list(ACTIONS))",
+        checkpoint: "The actions register, and a path outside the working folder returns 'blocked'."
+      },
+      {
+        title: "Declare the tools in Ollama's schema",
+        topic: "prompt-engineering",
+        detail: "Ollama accepts OpenAI-style JSON tool definitions. Describe each action so the model knows when and how to call it.",
+        code: "tools = [\n  {'type': 'function', 'function': {\n    'name': 'list_files',\n    'description': 'List files in a subfolder of the working directory.',\n    'parameters': {'type': 'object',\n      'properties': {'subdir': {'type': 'string'}}, 'required': []}}},\n  {'type': 'function', 'function': {\n    'name': 'read_file',\n    'description': 'Read the first 2000 chars of a text file.',\n    'parameters': {'type': 'object',\n      'properties': {'name': {'type': 'string'}}, 'required': ['name']}}},\n  {'type': 'function', 'function': {\n    'name': 'churn_score',\n    'description': 'Predict churn probability (0-1) for one customer.',\n    'parameters': {'type': 'object', 'properties': {\n      'tenure_months': {'type': 'integer'}, 'monthly_charge': {'type': 'number'},\n      'support_calls': {'type': 'integer'}, 'is_month_to_month': {'type': 'integer'}},\n      'required': ['tenure_months','monthly_charge','support_calls','is_month_to_month']}}},\n]\nprint(len(tools), 'tools declared')",
+        checkpoint: "Three tool schemas are declared and ready to pass to the model."
+      },
+      {
+        title: "Let the model call actions",
+        topic: "generative-ai-llm",
+        detail: "Pass `tools` to ollama.chat. The model replies with structured tool_calls; you execute each, append the result as a 'tool' message, and loop until it gives a final answer.",
+        code: "import ollama, json\n\ndef agent(task, model='llama3.1:8b'):\n    msgs = [{'role': 'user', 'content': task}]\n    while True:\n        r = ollama.chat(model=model, messages=msgs, tools=tools)\n        m = r['message']\n        if not m.get('tool_calls'):\n            return m['content']                      # final answer\n        msgs.append(m)\n        for call in m['tool_calls']:\n            name = call['function']['name']\n            args = call['function']['arguments']\n            result = ACTIONS[name](**args)           # DO the action\n            print('  ->', name, args, '=', str(result)[:80])\n            msgs.append({'role': 'tool', 'content': json.dumps(result, default=str)})\n\nprint(agent('List the files here, then read README.md and summarise it in one line.'))",
+        checkpoint: "The model calls list_files, then read_file, then answers — real local actions chosen by a local model."
+      },
+      {
+        title: "Gate risky actions behind confirmation",
+        topic: "mlops-monitoring",
+        detail: "Read-only tools can run automatically; anything that writes, deletes, or executes must ask a human first. This one rule keeps an autonomous local agent safe.",
+        code: "RISKY = {'write_file', 'delete_file', 'run_shell'}\n\ndef guarded(name, args):\n    if name in RISKY:\n        ok = input('Approve ' + name + ' ' + str(args) + '? [y/N] ')\n        if ok.strip().lower() != 'y':\n            return 'denied by user'\n    return ACTIONS[name](**args)\n# In agent(), call guarded(name, args) instead of ACTIONS[name](**args).\n# Golden rules: allowlist tools, sandbox paths, confirm writes, never auto-run shell.\nprint('risky actions now require human approval')",
+        checkpoint: "Write/delete/shell actions pause for a y/N — the agent acts locally without being able to do damage unattended."
+      }
+    ]
   }
 ];

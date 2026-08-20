@@ -29,7 +29,17 @@ ai-ml-knowledge-hub/      # the published site (only this folder is deployed)
 docs/                     # project governance (not deployed)
   WORKSHOP-SPEC.md        #   scope, audience, features — the source of truth
   AI_RULES.md             #   how content and code are authored
+  LOCAL-AI-LAB.md         #   guide to the run-it-locally build-along track
+  LOCAL-AI-RULES.md       #   authoring rules for the local builds
 ```
+
+## Local AI Lab
+
+Four build-along projects that run entirely on your own machine (local CPU/GPU,
+no cloud, no API keys) — train and use a model, build local RAG, and build two
+kinds of agent. They're in the app under **Projects**; the setup, hardware
+requirements, and safety notes are in
+[docs/LOCAL-AI-LAB.md](docs/LOCAL-AI-LAB.md).
 
 ## Hosting (automatic)
 
