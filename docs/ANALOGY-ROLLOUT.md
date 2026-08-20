@@ -42,19 +42,23 @@ Legend: ✅ done · ⬜ pending · **Flow** = gets an interactive flow strip.
 | classification | Sorting mail into labelled bins | — | ✅ |
 | correlation | Ice-cream sales and sunburns rise together (not cause) | — | ✅ |
 
-## Batch 3 — Foundations & tooling (pending)
+## Batch 3 — Foundations, tooling & core stats (done)
 
 | Topic | Analogy hook | Flow | Status |
 |-------|--------------|------|--------|
-| ds-ai-ml-overview | Nested Russian dolls: AI ⊃ ML ⊃ DL ⊃ GenAI | — | ⬜ |
-| data-science-workflow | Cooking a meal: gather → prep → cook → serve | Flow | ⬜ |
-| anaconda | A pre-stocked toolbox — batteries included | — | ⬜ |
-| jupyter | A lab notebook: notes and live experiments side by side | — | ⬜ |
-| colab | A free rented lab in the cloud (someone else's fast computer) | — | ⬜ |
-| python-why | The universal adapter that plugs into everything | — | ⬜ |
-| python-data-structures | Containers: shopping list / phone book / guest list | — | ⬜ |
+| ds-ai-ml-overview | Nested Russian dolls: AI ⊃ ML ⊃ DL ⊃ GenAI | — | ✅ |
+| data-science-workflow | Cooking a meal: shop → chop → taste → cook → plate | ✅ | ✅ |
+| anaconda | A pre-stocked kitchen — batteries included | — | ✅ |
+| jupyter | A lab notebook: notes and live experiments side by side | — | ✅ |
+| colab | A free rented lab in the cloud (someone else's fast computer) | — | ✅ |
+| python-why | The universal adapter that plugs into everything | — | ✅ |
+| python-data-structures | Containers: shopping list / phone book / guest list | — | ✅ |
+| descriptive-stats | A one-line summary of a whole crowd | — | ✅ |
+| variance-std | How consistent a machine's output is | — | ✅ |
+| normal-distribution | The bell curve of heights in a population | — | ✅ |
+| probability-basics | A weather forecast's "70% chance" | — | ✅ |
 
-## Batch 3 — NumPy, Pandas, Visualization (pending)
+## Batch 4 — NumPy, Pandas, Visualization (pending)
 
 | Topic | Analogy hook | Flow | Status |
 |-------|--------------|------|--------|
@@ -66,15 +70,6 @@ Legend: ✅ done · ⬜ pending · **Flow** = gets an interactive flow strip.
 | pandas-transform | Rearranging the furniture — same stuff, new layout | — | ⬜ |
 | matplotlib | Drawing a chart by giving step-by-step instructions | — | ⬜ |
 | choosing-a-chart | Right tool for the message — bar vs line vs scatter | — | ⬜ |
-
-## Batch 4 — Statistics (pending)
-
-| Topic | Analogy hook | Flow | Status |
-|-------|--------------|------|--------|
-| descriptive-stats | A one-line summary of a whole crowd | — | ⬜ |
-| variance-std | How consistent a machine's output is | — | ⬜ |
-| normal-distribution | The bell curve of heights in a population | — | ⬜ |
-| probability-basics | A weather forecast's "70% chance" | — | ⬜ |
 
 ## Batch 5 — Machine Learning (pending)
 
@@ -104,6 +99,5 @@ definition. Batched last, after the topic pages land.
 
 ---
 
-**Progress:** 20 / 45 topics · 0 / 37 glossary terms. Remaining: 25 topics
-(Foundations & tooling 7, NumPy/Pandas/Viz 8, Statistics 4, ML 2, DL & GenAI 2,
-MLOps 2) + glossary.
+**Progress:** 31 / 45 topics · 0 / 37 glossary terms. Remaining: 14 topics
+(NumPy/Pandas/Viz 8, ML 2, DL & GenAI 2, MLOps 2) + glossary.

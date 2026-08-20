@@ -160,6 +160,7 @@ window.ENRICH = {
 
   /* ---------- Foundations ---------- */
   "ds-ai-ml-overview": {
+    analogy: "Like **nested Russian dolls**. AI is the biggest doll — any machine acting smart. Open it and you find **ML** (systems that learn from data). Inside that, **deep learning** (neural nets). Inside that, **generative AI** (models that create text and images). Each sits *inside* the last — narrower, not 'newer is better'.",
     plainWords: "AI is the big umbrella (machines doing smart things), Machine Learning is one way to get there (learning patterns from data instead of hand-coded rules), and Data Science is the wider craft of turning data into decisions. GenAI is the newest ML branch that creates text and images.",
     actuallyDoes: "Frames the field so you can place any task correctly: rules vs learned patterns, prediction vs generation — which decides the tools you reach for.",
     practical: {
@@ -175,6 +176,18 @@ window.ENRICH = {
     }
   },
   "data-science-workflow": {
+    analogy: "Like **cooking a meal**. You shop for ingredients, wash and chop them, taste as you go, cook the dish, then plate it for guests. Data science is the same loop — and, like cooking, most of the effort is the unglamorous prep, not the fancy final step.",
+    flow: {
+      title: "The data science loop",
+      stages: [
+        { icon: "🛒", label: "Get data", d: "Collect the raw ingredients — files, databases, APIs." },
+        { icon: "🧽", label: "Clean", d: "Wash and chop: fix missing values, types, duplicates. Usually the biggest job." },
+        { icon: "🔍", label: "Explore (EDA)", d: "Taste as you go — plot and summarise to understand what you actually have." },
+        { icon: "🤖", label: "Model", d: "Cook: train a model or run the analysis that answers the question." },
+        { icon: "📤", label: "Share", d: "Plate it: a dashboard, report, or deployed prediction people can use." },
+        { icon: "🔁", label: "Iterate", d: "Feedback comes back and you refine — data work is a loop, not a straight line." }
+      ]
+    },
     prerequisites: ["ds-ai-ml-overview"],
     plainWords: "A project isn't 'train a model' — it's a loop: understand the question, get and clean data, explore it, model, evaluate, and ship. Most of the time goes into the boring middle, not the modelling.",
     actuallyDoes: "Gives you a repeatable checklist so you never skip framing the problem or validating the result — the two steps beginners most often drop.",
@@ -191,6 +204,7 @@ window.ENRICH = {
     }
   },
   "anaconda": {
+    analogy: "Like a **pre-stocked kitchen** instead of buying every pan and spice separately. Anaconda installs Python plus the whole data-science toolkit (NumPy, pandas, Jupyter…) in one go, already tested to work together — so you start cooking instead of wiring up your kitchen.",
     plainWords: "Anaconda bundles Python plus the data-science libraries and, crucially, lets you make separate 'environments' — sealed rooms so Project A's library versions never break Project B.",
     actuallyDoes: "Manages isolated per-project sets of packages and Python versions, so dependencies don't collide and a project stays reproducible.",
     practical: {
@@ -206,6 +220,7 @@ window.ENRICH = {
     }
   },
   "jupyter": {
+    analogy: "Like a **lab notebook where you write and run experiments side by side**. Each cell is a little experiment — run it, see the result right underneath, jot a note, tweak, rerun. Perfect for exploring data step by step instead of running a whole script blind.",
     prerequisites: ["anaconda"],
     plainWords: "A Jupyter notebook is a document where code, its output, and your notes live together in cells you run one at a time — perfect for exploring data and keeping a visible trail of what you tried.",
     actuallyDoes: "Runs a persistent Python kernel; each cell mutates shared state and shows its result inline, so you build up an analysis incrementally without re-running everything.",
@@ -222,6 +237,7 @@ window.ENRICH = {
     }
   },
   "colab": {
+    analogy: "Like **renting a fully-equipped lab in the cloud for free**. It's Jupyter running on Google's computers — including free GPUs — so you can train models from a laptop or phone with nothing installed. Your work lives in the browser, like a Google Doc.",
     plainWords: "Google Colab is a Jupyter notebook that runs in the browser on Google's machines — no install, and free access to GPUs for heavier deep-learning work.",
     actuallyDoes: "Hosts your notebook on a remote runtime (CPU/GPU/TPU) you connect to from the browser; files and sessions are temporary unless you mount Google Drive.",
     practical: {
@@ -255,6 +271,7 @@ window.ENRICH = {
 
   /* ---------- Python ---------- */
   "python-why": {
+    analogy: "Like the **universal adapter of programming** — the language almost every data and AI tool speaks. Readable enough for beginners, powerful enough for production, with a library for nearly everything — so you spend your time on the problem, not the plumbing.",
     plainWords: "Python won data science because it reads almost like English and has a giant free toolbox (NumPy, pandas, scikit-learn) that does the heavy lifting — so you spend time on the problem, not the plumbing.",
     actuallyDoes: "Acts as the glue language: concise syntax on top, fast C/Fortran libraries underneath, so you get readable code and real speed together.",
     practical: {
@@ -270,6 +287,7 @@ window.ENRICH = {
     }
   },
   "python-data-structures": {
+    analogy: "Like different **containers for different jobs**: a **list** is a shopping list (ordered, add and remove freely), a **dict** is a phone book (look up a value by its key), a **set** is a guest list (no duplicates, membership at a glance). Picking the right container makes code simpler and faster.",
     prerequisites: ["python-why"],
     plainWords: "Lists (ordered, changeable), tuples (ordered, fixed), dicts (labelled lookups) and sets (unique items) are the four containers you'll use constantly — picking the right one makes code simpler and faster.",
     actuallyDoes: "Each structure trades off order, mutability and lookup speed; choosing correctly turns O(n) scans into O(1) lookups and prevents whole classes of bugs.",
@@ -422,6 +440,7 @@ window.ENRICH = {
 
   /* ---------- Statistics ---------- */
   "descriptive-stats": {
+    analogy: "Like **summing up a whole crowd in one sentence** — 'mostly 30-somethings, average height 1.7 m, a few outliers'. Instead of staring at thousands of rows, a handful of numbers (mean, median, spread) tell you the shape of the data at a glance.",
     prerequisites: ["numpy-ndarray"],
     plainWords: "Before modelling, describe the data in a few numbers: the centre (mean/median/mode) and where it sits. The median resists outliers; the mean doesn't — that difference matters constantly.",
     actuallyDoes: "Reduces a column to summary statistics of location, so you understand a distribution's typical value and how outliers shift it.",
@@ -438,6 +457,7 @@ window.ENRICH = {
     }
   },
   "variance-std": {
+    analogy: "Like judging **how consistent a machine is**. Two machines both average 10 mm parts, but one makes 9.9–10.1 and the other 8–12. Same average, wildly different reliability. Standard deviation *is* that spread — how far values typically stray from the average.",
     prerequisites: ["descriptive-stats"],
     plainWords: "The mean tells you the centre; standard deviation tells you the spread — how far values typically sit from that centre. Two datasets can share a mean yet feel completely different.",
     actuallyDoes: "Computes the average squared distance from the mean (variance) and its square root (std), giving spread in the data's own units.",
@@ -454,6 +474,7 @@ window.ENRICH = {
     }
   },
   "normal-distribution": {
+    analogy: "Like the **bell curve of human heights** — most people cluster near the average, with fewer and fewer very short or very tall. This same bell shape shows up everywhere in nature and measurement, which is why so many statistical methods assume it.",
     prerequisites: ["variance-std"],
     plainWords: "The normal (bell) curve describes tons of natural measurements: most values cluster near the mean and taper symmetrically. Its 68–95–99.7 rule tells you how much data falls within 1, 2, 3 std of the mean.",
     actuallyDoes: "Models data with a symmetric density defined by mean and std; the empirical rule quantifies how probability mass concentrates near the centre.",
@@ -487,6 +508,7 @@ window.ENRICH = {
     }
   },
   "probability-basics": {
+    analogy: "Like a **weather forecast's '70% chance of rain'**. It doesn't say yes or no — it puts a number between 0 and 1 on how likely something is. Models speak this language too: a churn model says '0.83 likely to leave', not a flat yes.",
     prerequisites: ["descriptive-stats"],
     plainWords: "Probability puts a number from 0 to 1 on how likely something is. The key beginner trap is conditional probability — how a new piece of evidence updates the odds (the heart of Bayes and of ML).",
     actuallyDoes: "Quantifies uncertainty and updates it with evidence; conditional probability and Bayes' rule are the machinery behind classifiers and A/B tests.",
