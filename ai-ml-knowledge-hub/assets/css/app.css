@@ -400,6 +400,22 @@ pre.code .str { color: #aebf92; }
 .callout.plain .callout-k { color: var(--color-accent-2-700); }
 .callout.does .callout-k { color: var(--color-accent-700); }
 .callout-v { font-size: 15.5px; line-height: 1.6; }
+/* Real-world analogy — a distinct, full-width callout under the plain-words row. */
+.callout.analogy { background: color-mix(in srgb, var(--color-accent) 9%, var(--color-surface)); border-left: 4px solid var(--color-accent); margin-bottom: var(--space-6); }
+.callout.analogy .callout-k { color: var(--color-accent-700); }
+
+/* Interactive flow strip — click a stage to reveal its note. */
+.flowbox { background: var(--color-surface); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-4) var(--space-3); }
+.flow { display: flex; align-items: stretch; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+.flow-stage { flex: 1 0 120px; display: flex; flex-direction: column; align-items: center; gap: 5px; text-align: center; cursor: pointer; background: var(--color-bg); border: 1.5px solid var(--color-divider); border-radius: var(--radius-md); padding: 12px 12px; transition: border-color .12s, transform .12s, box-shadow .12s; }
+.flow-stage:hover { border-color: var(--color-accent-400); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.flow-stage.active { border-color: var(--color-accent); background: color-mix(in srgb, var(--color-accent) 8%, var(--color-bg)); }
+.flow-stage .fl-ico { font-size: 24px; line-height: 1.1; }
+.flow-stage .fl-label { font-family: var(--font-heading); font-size: 13px; }
+.flow-arrow { display: flex; align-items: center; color: var(--color-neutral-400); flex: none; }
+.flow-caps { margin-top: var(--space-3); }
+.flow-cap { font-size: 15px; line-height: 1.6; background: color-mix(in srgb, var(--color-accent) 6%, var(--color-surface)); border-radius: var(--radius-md); padding: 12px 14px; }
+@media (max-width: 720px) { .flow-arrow { display: none; } }
 
 .walkthrough { list-style: none; counter-reset: wt; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-2); }
 .walkthrough li { counter-increment: wt; position: relative; padding: var(--space-3) var(--space-4) var(--space-3) 52px; background: var(--color-surface); border-radius: var(--radius-md); }

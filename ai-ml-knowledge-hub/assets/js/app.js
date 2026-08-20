@@ -247,6 +247,8 @@
     // key takeaway up top as TL;DR
     h += '<div class="tldr"><span class="tldr-ico">' + ICONS.bulb + '</span><div><div class="tldr-label">Key takeaway</div><div class="tldr-text">' + md(t.keyTakeaway) + "</div></div></div>";
     h += calloutsHtml(t);
+    h += analogyHtml(t);
+    h += flowHtml(t.flow);
 
     var n = 1;
     h += sec(n++, "What is it?", '<p class="lead">' + md(t.definition) + "</p>");
@@ -298,6 +300,7 @@
       cb.innerHTML = isDone(id) ? ICONS.check + " Completed" : "Mark as complete";
     });
     wirePracticals();
+    wireFlows();
     var vizHost = $("#vizHost");
     if (vizHost && t.viz && window.VIZ[t.viz]) {
       if (window.__loadVizPalette) window.__loadVizPalette();
@@ -448,6 +451,37 @@
     if (t.actuallyDoes) h += '<div class="callout does"><div class="callout-k">What it actually does</div><div class="callout-v">' + md(t.actuallyDoes) + "</div></div>";
     return h ? '<div class="callout-row">' + h + "</div>" : "";
   }
+  // Real-world analogy callout (optional per topic).
+  function analogyHtml(t) {
+    if (!t.analogy) return "";
+    return '<div class="callout analogy"><div class="callout-k">Like in the real world</div><div class="callout-v">' + md(t.analogy) + "</div></div>";
+  }
+  // Interactive flow strip (optional per topic): click a stage to reveal its note.
+  function flowHtml(f) {
+    if (!f || !f.stages || !f.stages.length) return "";
+    var stages = f.stages.map(function (s, i) {
+      return '<button class="flow-stage' + (i === 0 ? " active" : "") + '" data-i="' + i + '">' +
+        '<span class="fl-ico">' + esc(s.icon || "•") + "</span>" +
+        '<span class="fl-label">' + esc(s.label) + "</span></button>";
+    }).join('<span class="flow-arrow">' + ICONS.arrow.replace('width="20" height="20"', 'width="15" height="15"') + "</span>");
+    var caps = f.stages.map(function (s, i) {
+      return '<div class="flow-cap" data-i="' + i + '"' + (i === 0 ? "" : " hidden") + "><strong>" + esc(s.label) + "</strong> — " + md(s.d || "") + "</div>";
+    }).join("");
+    return '<div class="sec"><h2>' + esc(f.title || "The flow, step by step") + "</h2>" +
+      '<div class="flowbox"><div class="flow">' + stages + '</div><div class="flow-caps">' + caps + "</div></div></div>";
+  }
+  function wireFlows() {
+    Array.prototype.forEach.call(content.querySelectorAll(".flowbox"), function (box) {
+      var stages = box.querySelectorAll(".flow-stage"), caps = box.querySelectorAll(".flow-cap");
+      Array.prototype.forEach.call(stages, function (b) {
+        b.addEventListener("click", function () {
+          var i = b.getAttribute("data-i");
+          Array.prototype.forEach.call(stages, function (x) { x.classList.toggle("active", x === b); });
+          Array.prototype.forEach.call(caps, function (c) { c.hidden = c.getAttribute("data-i") !== i; });
+        });
+      });
+    });
+  }
   function walkthroughHtml(t, n) {
     if (!t.walkthrough || !t.walkthrough.length) return "";
     var steps = t.walkthrough.map(function (s) {
@@ -494,6 +528,7 @@
       '<a class="btn btn-secondary" href="#t/' + t.id + '" id="toLearn">Full explanation →</a></div></div>';
     h += prereqStrip(t);
     h += calloutsHtml(t);
+    h += analogyHtml(t);
     h += '<div class="cheat-grid">';
     h += '<div class="cheat-cell"><div class="cheat-k">What it is</div><div class="cheat-v">' + md(t.definition) + "</div></div>";
     h += '<div class="cheat-cell"><div class="cheat-k">Problem it solves</div><div class="cheat-v">' + md(t.problem) + "</div></div>";

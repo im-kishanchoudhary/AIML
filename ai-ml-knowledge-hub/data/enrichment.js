@@ -9,6 +9,17 @@
    ============================================================ */
 window.ENRICH = {
   "ml-fundamentals": {
+    analogy: "Like training a new hire by showing them thousands of past cases instead of handing them a rulebook. Show a child enough photos of cats and dogs and they learn the difference themselves — you never define 'cat'. Machine learning is exactly that: **learn the rule from examples, don't hand-write it.**",
+    flow: {
+      title: "How a model is built and used",
+      stages: [
+        { icon: "📊", label: "Collect examples", d: "Gather past cases where you already know the answer — the labelled training data." },
+        { icon: "✍️", label: "Train", d: "The algorithm finds the pattern that maps inputs to the known answers. This is `model.fit()`." },
+        { icon: "📝", label: "Evaluate", d: "Check it on held-out examples it never saw while training — the honest score." },
+        { icon: "⚡", label: "Predict", d: "Feed it a brand-new case and it returns an answer in milliseconds." },
+        { icon: "🔁", label: "Improve", d: "Add data or better features and repeat — models get better with feedback." }
+      ]
+    },
     prerequisites: ["python-why", "pandas-dataframe"],
     plainWords: "Instead of writing the rules yourself, you show the computer lots of examples and it works out the rules — like learning to recognise spam by seeing thousands of spam and non-spam emails, not by being told 'block anything with the word FREE'.",
     actuallyDoes: "Takes a table of past examples (features + known answers), finds the pattern that maps features → answer, and saves it as a reusable function you can call on new rows.",
@@ -25,6 +36,7 @@ window.ENRICH = {
     }
   },
   "standardization": {
+    analogy: "Like **converting every price into one currency** before comparing. A €5 coffee and a ¥600 coffee only compare fairly once they're on the same scale. Features measured in dollars, years and counts need the same treatment — otherwise the biggest-numbered column wins by accident, not because it matters most.",
     prerequisites: ["variance-std", "numpy-vectorization"],
     plainWords: "Different features use different rulers — dollars vs years vs counts. Standardizing puts them all on the same ruler so no feature wins just because its numbers happen to be bigger.",
     actuallyDoes: "Subtracts each column's mean and divides by its standard deviation, so every feature ends up centred at 0 with a spread of 1.",
@@ -79,6 +91,7 @@ window.ENRICH = {
     }
   },
   "tokens-embeddings": {
+    analogy: "Like giving every word a **GPS coordinate in 'meaning space'**, so related words sit close together — 'king' near 'queen', 'Paris' near 'France'. The model can then do arithmetic with meaning instead of matching exact letters, which is why search finds 'refund' even when you typed 'money back'.",
     prerequisites: ["generative-ai-llm"],
     plainWords: "An embedding is a way of giving every word or sentence a set of coordinates, so that things which mean similar things end up near each other on a map — 'car' and 'automobile' become neighbours even though they share no letters.",
     actuallyDoes: "Runs text through a model that outputs a fixed-length list of numbers (a vector); the closeness of two vectors measures how similar the meanings are.",
@@ -101,6 +114,16 @@ window.ENRICH = {
     }
   },
   "rag": {
+    analogy: "Like an **open-book exam** instead of a memory test. A plain LLM answers from memory and can confidently bluff. RAG lets it look up the relevant page first and answer from what it just read — so it stays current and can **cite its source**, without re-memorising the whole book.",
+    flow: {
+      title: "The RAG loop",
+      stages: [
+        { icon: "❓", label: "Question", d: "The user asks something — often about private or recent data the model never trained on." },
+        { icon: "🔎", label: "Retrieve", d: "Embed the question and pull the most relevant chunks from your document store." },
+        { icon: "➕", label: "Augment", d: "Paste those chunks into the prompt as context, with an instruction to answer **only** from them." },
+        { icon: "🗣️", label: "Generate", d: "The LLM writes the answer grounded in the retrieved text — and can point to where it came from." }
+      ]
+    },
     prerequisites: ["generative-ai-llm", "tokens-embeddings", "vector-search"],
     plainWords: "A plain LLM answers from memory and can make things up. RAG is like giving it an open-book exam: before it answers, you hand it the exact pages from your own documents, and it answers from those — so it's grounded in your real, current information.",
     actuallyDoes: "Embeds the user's question, searches your document vectors for the most relevant chunks, pastes those chunks into the prompt as context, and asks the LLM to answer using only that context.",
@@ -468,6 +491,7 @@ window.ENRICH = {
     }
   },
   "hypothesis-testing": {
+    analogy: "Like a **courtroom**. The default (the *null hypothesis*) is 'innocent — nothing is going on'. Your data is the evidence. The **p-value** is how surprising that evidence would be *if the defendant were truly innocent*; small enough, and you reject 'innocent'. You never *prove* innocence — you just fail to convict.",
     prerequisites: ["normal-distribution", "probability-basics"],
     plainWords: "A hypothesis test asks: could this difference be just luck? The p-value is the chance of seeing a result this extreme if nothing were really going on. Small p (<0.05) → probably a real effect.",
     actuallyDoes: "Compares observed data against a 'nothing happening' null model and returns the probability of the observation under that null (the p-value).",
@@ -550,6 +574,7 @@ window.ENRICH = {
     }
   },
   "overfitting": {
+    analogy: "Like a student who **memorised last year's exam paper** instead of learning the subject. Flawless on the questions they've already seen, lost the moment the questions change. A model that memorises its training data looks brilliant in rehearsal and then fails on real, unseen customers.",
     prerequisites: ["train-test-split"],
     plainWords: "Overfitting is memorising the training data — including its noise — so the model aces training but flops on new data. Underfitting is the opposite: too simple to capture the pattern. You want the middle.",
     actuallyDoes: "Trades bias for variance: an over-flexible model fits noise (high variance), an over-simple one misses signal (high bias); the gap between train and test score reveals which.",
@@ -566,6 +591,7 @@ window.ENRICH = {
     }
   },
   "model-evaluation": {
+    analogy: "Like a **report card, not a single grade**. *Judge a fish by its ability to climb a tree* and every fish fails — the wrong metric hides the truth. Accuracy alone flatters a model on rare events (say '99% not fraud' by never catching any fraud); precision and recall reveal what it actually catches and what it misses.",
     prerequisites: ["classification", "train-test-split"],
     plainWords: "Accuracy alone lies on imbalanced data. The confusion matrix splits right/wrong into types; precision asks 'of my positive calls, how many were right?' and recall asks 'of the real positives, how many did I catch?'.",
     actuallyDoes: "Breaks predictions into true/false positives/negatives and derives precision, recall and F1 — metrics that expose failures accuracy hides.",
@@ -696,6 +722,17 @@ window.ENRICH = {
 
   /* ---------- Deep learning ---------- */
   "neural-networks": {
+    analogy: "Like an **assembly line of specialists**. Raw input enters at one end; each layer of workers spots slightly more complex patterns (edges → shapes → faces) and passes its findings to the next. No single worker understands the whole job — the layers *together* do.",
+    flow: {
+      title: "How signal flows through the network",
+      stages: [
+        { icon: "📥", label: "Input layer", d: "The raw features enter — pixels, numbers, or token vectors." },
+        { icon: "🧩", label: "Hidden layers", d: "Each layer combines the previous one's signals into steadily richer patterns (edges → shapes → objects)." },
+        { icon: "⚙️", label: "Weights + activation", d: "Every connection has a **weight**; an **activation function** lets the network bend, not just draw straight lines." },
+        { icon: "📤", label: "Output", d: "The final layer turns all of that into a prediction — a class or a number." },
+        { icon: "🔁", label: "Backprop", d: "The error is sent *backwards* to nudge every weight — that's gradient descent doing the actual learning." }
+      ]
+    },
     prerequisites: ["ml-fundamentals", "standardization"],
     plainWords: "A neural network stacks simple units (neurons): each multiplies inputs by weights, adds them, and passes the result through a squashing function. Stack enough layers and it can learn very complex patterns.",
     actuallyDoes: "Composes layers of weighted sums + non-linear activations; training adjusts the weights so the composed function maps inputs to correct outputs.",
@@ -728,6 +765,17 @@ window.ENRICH = {
     }
   },
   "gradient-descent": {
+    analogy: "Like hiking down a mountain in thick fog. You can't see the valley, but you can feel which way slopes **downhill** under your feet, take a step that way, and repeat. The *learning rate* is your step size — tiny steps are slow, giant steps overshoot the valley and bounce around.",
+    flow: {
+      title: "One step of learning, repeated thousands of times",
+      stages: [
+        { icon: "🎯", label: "Guess", d: "Start with random weights — the model knows nothing yet." },
+        { icon: "📏", label: "Measure error", d: "Compare predictions to the truth with a **loss function**: how wrong are we right now?" },
+        { icon: "🧭", label: "Find the slope", d: "The **gradient** points in the direction that *increases* error; downhill is the opposite way." },
+        { icon: "👣", label: "Step downhill", d: "Nudge each weight a little against the gradient. How big a nudge = the learning rate." },
+        { icon: "🔁", label: "Repeat", d: "Do it again and again until the error stops dropping — you've reached the valley (the minimum)." }
+      ]
+    },
     prerequisites: ["activation-loss"],
     plainWords: "Gradient descent is how a model learns: compute which way the loss goes downhill (the gradient) and take a small step that way, over and over. Backpropagation is the efficient way to get those gradients through the layers.",
     actuallyDoes: "Iteratively updates parameters by subtracting the learning-rate-scaled gradient of the loss, converging toward a minimum.",
@@ -744,6 +792,7 @@ window.ENRICH = {
     }
   },
   "cnn-rnn-transformers": {
+    analogy: "Three tools for three jobs. A **CNN** is a magnifying glass sweeping across an image for local patterns. An **RNN** reads a sentence word-by-word, remembering what came before. A **Transformer** reads the whole page at once and draws lines between related words — which is why it powers modern LLMs.",
     prerequisites: ["neural-networks", "gradient-descent"],
     plainWords: "Different data needs different architectures: CNNs for images (they scan for local patterns), RNNs for sequences (they carry memory), and Transformers (self-attention) for language — the design behind modern LLMs.",
     actuallyDoes: "Each architecture bakes in an inductive bias: convolution for spatial locality, recurrence/attention for order, self-attention for long-range token relationships computed in parallel.",
