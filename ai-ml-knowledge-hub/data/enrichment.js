@@ -162,6 +162,12 @@ window.ENRICH = {
 
   /* ---------- Foundations ---------- */
   "ds-ai-ml-overview": {
+    flow: { title: "The nesting, outside in", stages: [
+      { icon: "🌐", label: "AI", d: "Any machine acting smart — even hand-written rules." },
+      { icon: "📈", label: "Machine Learning", d: "A slice of AI that learns patterns from data." },
+      { icon: "🧠", label: "Deep Learning", d: "ML using many-layered neural networks." },
+      { icon: "✨", label: "Generative AI", d: "Deep learning that creates new text and images." }
+    ] },
     analogy: "Like **nested Russian dolls**. AI is the biggest doll — any machine acting smart. Open it and you find **ML** (systems that learn from data). Inside that, **deep learning** (neural nets). Inside that, **generative AI** (models that create text and images). Each sits *inside* the last — narrower, not 'newer is better'.",
     plainWords: "AI is the big umbrella (machines doing smart things), Machine Learning is one way to get there (learning patterns from data instead of hand-coded rules), and Data Science is the wider craft of turning data into decisions. GenAI is the newest ML branch that creates text and images.",
     actuallyDoes: "Frames the field so you can place any task correctly: rules vs learned patterns, prediction vs generation — which decides the tools you reach for.",
@@ -206,6 +212,12 @@ window.ENRICH = {
     }
   },
   "anaconda": {
+    flow: { title: "What one install gives you", stages: [
+      { icon: "⬇️", label: "Install once", d: "One download — no piecing tools together." },
+      { icon: "🐍", label: "Python + tools", d: "Python, NumPy, pandas, Jupyter already included." },
+      { icon: "📦", label: "Environments", d: "Separate, clean setups per project (conda envs)." },
+      { icon: "▶️", label: "Start working", d: "Launch Jupyter and go." }
+    ] },
     analogy: "Like a **pre-stocked kitchen** instead of buying every pan and spice separately. Anaconda installs Python plus the whole data-science toolkit (NumPy, pandas, Jupyter…) in one go, already tested to work together — so you start cooking instead of wiring up your kitchen.",
     plainWords: "Anaconda bundles Python plus the data-science libraries and, crucially, lets you make separate 'environments' — sealed rooms so Project A's library versions never break Project B.",
     actuallyDoes: "Manages isolated per-project sets of packages and Python versions, so dependencies don't collide and a project stays reproducible.",
@@ -222,6 +234,12 @@ window.ENRICH = {
     }
   },
   "jupyter": {
+    flow: { title: "How a notebook flows", stages: [
+      { icon: "✍️", label: "Write a cell", d: "A small chunk of code." },
+      { icon: "▶️", label: "Run it", d: "Execute just that cell." },
+      { icon: "👀", label: "See output", d: "The result appears right below." },
+      { icon: "🔁", label: "Tweak & repeat", d: "Adjust and rerun — explore step by step." }
+    ] },
     analogy: "Like a **lab notebook where you write and run experiments side by side**. Each cell is a little experiment — run it, see the result right underneath, jot a note, tweak, rerun. Perfect for exploring data step by step instead of running a whole script blind.",
     prerequisites: ["anaconda"],
     plainWords: "A Jupyter notebook is a document where code, its output, and your notes live together in cells you run one at a time — perfect for exploring data and keeping a visible trail of what you tried.",
@@ -239,6 +257,12 @@ window.ENRICH = {
     }
   },
   "colab": {
+    flow: { title: "Colab in a nutshell", stages: [
+      { icon: "🔗", label: "Open a link", d: "A notebook in your browser — nothing installed." },
+      { icon: "☁️", label: "Google's machine", d: "Runs on their computer, for free." },
+      { icon: "⚡", label: "Turn on GPU", d: "One menu click for accelerated training." },
+      { icon: "💾", label: "Saves to Drive", d: "Your work lives like a Google Doc." }
+    ] },
     analogy: "Like **renting a fully-equipped lab in the cloud for free**. It's Jupyter running on Google's computers — including free GPUs — so you can train models from a laptop or phone with nothing installed. Your work lives in the browser, like a Google Doc.",
     plainWords: "Google Colab is a Jupyter notebook that runs in the browser on Google's machines — no install, and free access to GPUs for heavier deep-learning work.",
     actuallyDoes: "Hosts your notebook on a remote runtime (CPU/GPU/TPU) you connect to from the browser; files and sessions are temporary unless you mount Google Drive.",
@@ -273,6 +297,12 @@ window.ENRICH = {
 
   /* ---------- Python ---------- */
   "python-why": {
+    flow: { title: "Why Python fits data work", stages: [
+      { icon: "📖", label: "Readable", d: "Looks almost like English — easy to learn." },
+      { icon: "📚", label: "Libraries", d: "A package for nearly everything (pandas, sklearn…)." },
+      { icon: "🔌", label: "Glue", d: "Connects data, models and apps easily." },
+      { icon: "🚀", label: "To production", d: "The same code can run in real systems." }
+    ] },
     analogy: "Like the **universal adapter of programming** — the language almost every data and AI tool speaks. Readable enough for beginners, powerful enough for production, with a library for nearly everything — so you spend your time on the problem, not the plumbing.",
     plainWords: "Python won data science because it reads almost like English and has a giant free toolbox (NumPy, pandas, scikit-learn) that does the heavy lifting — so you spend time on the problem, not the plumbing.",
     actuallyDoes: "Acts as the glue language: concise syntax on top, fast C/Fortran libraries underneath, so you get readable code and real speed together.",
@@ -289,6 +319,12 @@ window.ENRICH = {
     }
   },
   "python-data-structures": {
+    flow: { title: "Pick the right container", stages: [
+      { icon: "📝", label: "List", d: "Ordered items you add/remove — a shopping list." },
+      { icon: "🔑", label: "Dict", d: "Look up a value by its key — a phone book." },
+      { icon: "🎯", label: "Set", d: "Unique items, fast membership — a guest list." },
+      { icon: "🔒", label: "Tuple", d: "A fixed, unchangeable group of values." }
+    ] },
     analogy: "Like different **containers for different jobs**: a **list** is a shopping list (ordered, add and remove freely), a **dict** is a phone book (look up a value by its key), a **set** is a guest list (no duplicates, membership at a glance). Picking the right container makes code simpler and faster.",
     prerequisites: ["python-why"],
     plainWords: "Lists (ordered, changeable), tuples (ordered, fixed), dicts (labelled lookups) and sets (unique items) are the four containers you'll use constantly — picking the right one makes code simpler and faster.",
@@ -308,6 +344,12 @@ window.ENRICH = {
 
   /* ---------- NumPy ---------- */
   "numpy-ndarray": {
+    flow: { title: "Why arrays are fast", stages: [
+      { icon: "🧊", label: "Same type", d: "Every cell holds the same kind of number." },
+      { icon: "📦", label: "Packed tight", d: "Stored in one contiguous block of memory." },
+      { icon: "⚡", label: "Bulk math", d: "Operate on the whole array at C speed." },
+      { icon: "🧮", label: "N dimensions", d: "1D vectors, 2D matrices, and beyond." }
+    ] },
     analogy: "Like an **egg carton** — a rigid grid of same-sized cells the computer reads in one sweep. Because every cell holds the same type packed tightly together, math over millions of numbers runs at C speed, not slow Python-loop speed.",
     prerequisites: ["python-data-structures"],
     plainWords: "A NumPy array is like a Python list that's all one type and stored in a tight block of memory, so maths on millions of numbers runs at C speed instead of slow Python loops.",
@@ -325,6 +367,12 @@ window.ENRICH = {
     }
   },
   "numpy-vectorization": {
+    flow: { title: "Loop vs vectorized", stages: [
+      { icon: "🐌", label: "Python loop", d: "One number at a time — slow." },
+      { icon: "📸", label: "Vectorize", d: "Express the whole operation at once." },
+      { icon: "⚡", label: "Runs in C", d: "NumPy does the batch in fast compiled code." },
+      { icon: "✅", label: "Same result", d: "Shorter code, often 10–100× faster." }
+    ] },
     analogy: "Like a **photocopier vs writing each page by hand**. A Python loop handles one number at a time; a vectorized NumPy operation runs the whole batch in one machine-level stroke. Same result, often 10–100× faster — and shorter code.",
     prerequisites: ["numpy-ndarray"],
     plainWords: "Vectorization means expressing a calculation over a whole array at once instead of looping element by element — shorter to write and often 10–100× faster. Broadcasting lets arrays of different shapes combine sensibly.",
@@ -344,6 +392,12 @@ window.ENRICH = {
 
   /* ---------- Pandas ---------- */
   "pandas-dataframe": {
+    flow: { title: "A DataFrame at a glance", stages: [
+      { icon: "🧱", label: "Rows & columns", d: "A table, like a spreadsheet." },
+      { icon: "🏷️", label: "Labels", d: "Named columns and an index to find rows." },
+      { icon: "🔧", label: "One-line ops", d: "Filter, sort, group with a single call." },
+      { icon: "🔁", label: "Repeatable", d: "It's code, so it reruns identically." }
+    ] },
     analogy: "Like a **spreadsheet you drive with code instead of a mouse**. Same rows and columns you know from Excel, but you filter, join and transform millions of rows with one line — repeatably, with no manual clicking.",
     prerequisites: ["numpy-ndarray"],
     plainWords: "A DataFrame is a spreadsheet in code: labelled columns, an index for rows, each column a NumPy array. A Series is a single column. It's the table every data project revolves around.",
@@ -361,6 +415,12 @@ window.ENRICH = {
     }
   },
   "pandas-loading": {
+    flow: { title: "Getting data in", stages: [
+      { icon: "📁", label: "Point at a source", d: "A CSV, an Excel file, or a database." },
+      { icon: "⬇️", label: "read_csv / read_sql", d: "One call pulls it into a DataFrame." },
+      { icon: "👀", label: "Peek", d: "`.head()` and `.info()` to see what you got." },
+      { icon: "➡️", label: "Ready", d: "Now clean and explore it." }
+    ] },
     analogy: "Like **opening a spreadsheet into your workspace**. `read_csv` (or read_excel / read_sql) pulls a file or database table straight into a DataFrame so you can start working — the very first step of almost every data project.",
     prerequisites: ["pandas-dataframe"],
     plainWords: "Real data lives in CSVs, Excel and databases. `read_csv` pulls it in, and a few one-liners (`head`, `info`, `describe`) tell you instantly what you're dealing with before you touch it.",
@@ -405,6 +465,12 @@ window.ENRICH = {
     }
   },
   "pandas-transform": {
+    flow: { title: "Reshape the same data", stages: [
+      { icon: "🧩", label: "Group", d: "Summarise rows into per-group numbers." },
+      { icon: "🔄", label: "Pivot / melt", d: "Swap between wide and long layouts." },
+      { icon: "🔗", label: "Merge", d: "Join tables on a shared key." },
+      { icon: "📊", label: "Same facts", d: "New shape — nothing invented." }
+    ] },
     analogy: "Like **rearranging the furniture — same stuff, new layout**. Group, pivot, melt and merge reshape the *same* data into whatever form the question needs — long to wide, many rows into one summary — without changing the underlying facts.",
     prerequisites: ["pandas-cleaning"],
     plainWords: "Once clean, you reshape and summarise: group rows and aggregate them, make new columns, pivot. This is where a table starts answering questions ('average spend per city?').",
@@ -424,6 +490,12 @@ window.ENRICH = {
 
   /* ---------- Visualization ---------- */
   "matplotlib": {
+    flow: { title: "Building a chart", stages: [
+      { icon: "🖼️", label: "Make axes", d: "Create the figure and axes." },
+      { icon: "✏️", label: "Plot data", d: "Add lines, bars or points." },
+      { icon: "🏷️", label: "Label", d: "Title, axis names, legend." },
+      { icon: "🔁", label: "Regenerate", d: "Rerun the instant the data changes." }
+    ] },
     analogy: "Like **drawing a chart by giving step-by-step instructions** — 'axis here, this line, that label' — rather than clicking a chart wizard. More effort up front, but total control and a picture you can regenerate the instant the data changes.",
     prerequisites: ["numpy-ndarray"],
     plainWords: "Matplotlib is Python's core plotting library — the thing that actually draws the line, bar and scatter charts. Most other plotting tools are built on top of it.",
@@ -441,6 +513,12 @@ window.ENRICH = {
     }
   },
   "choosing-a-chart": {
+    flow: { title: "Match the chart to the question", stages: [
+      { icon: "🔢", label: "Compare categories", d: "Use a bar chart." },
+      { icon: "📈", label: "Change over time", d: "Use a line chart." },
+      { icon: "🔗", label: "Relationship", d: "Use a scatter plot." },
+      { icon: "🥧", label: "Parts of a whole", d: "A pie or stacked bar — sparingly." }
+    ] },
     analogy: "Like **picking the right tool for the message**. A bar chart compares categories, a line shows change over time, a scatter reveals a relationship. The wrong chart hides the story; matching the chart to the question makes it obvious.",
     prerequisites: ["matplotlib"],
     plainWords: "The chart type should match the question: comparison → bars, trend over time → line, distribution → histogram, relationship → scatter. Pick wrong and you hide the story or mislead.",
@@ -678,6 +756,12 @@ window.ENRICH = {
     }
   },
   "hyperparameter-tuning": {
+    flow: { title: "Finding good settings", stages: [
+      { icon: "🎛️", label: "List the dials", d: "Depth, learning rate, k, and so on." },
+      { icon: "🔀", label: "Try combinations", d: "Grid search or random search." },
+      { icon: "📝", label: "Score each", d: "On a validation set — never the test set." },
+      { icon: "🏆", label: "Keep the best", d: "Refit with the winning settings." }
+    ] },
     analogy: "Like **dialling in an oven for the best bake**. The recipe (the algorithm) is fixed, but temperature and time (the hyperparameters) change the result. You try combinations and keep the settings that come out best on unseen data.",
     prerequisites: ["overfitting", "train-test-split"],
     plainWords: "Hyperparameters are the knobs you set before training (tree depth, regularization strength, k). Tuning searches combinations to find the settings that generalise best — judged by cross-validation, not the test set.",
@@ -876,6 +960,12 @@ window.ENRICH = {
     }
   },
   "cnn-rnn-transformers": {
+    flow: { title: "Three tools, three jobs", stages: [
+      { icon: "🔍", label: "CNN", d: "Slides a filter over an image for local patterns." },
+      { icon: "➡️", label: "RNN", d: "Reads a sequence step by step, remembering." },
+      { icon: "🔗", label: "Transformer", d: "Reads all tokens at once via attention." },
+      { icon: "💬", label: "LLMs", d: "Built on transformers — today's language models." }
+    ] },
     analogy: "Three tools for three jobs. A **CNN** is a magnifying glass sweeping across an image for local patterns. An **RNN** reads a sentence word-by-word, remembering what came before. A **Transformer** reads the whole page at once and draws lines between related words — which is why it powers modern LLMs.",
     prerequisites: ["neural-networks", "gradient-descent"],
     plainWords: "Different data needs different architectures: CNNs for images (they scan for local patterns), RNNs for sequences (they carry memory), and Transformers (self-attention) for language — the design behind modern LLMs.",
@@ -923,6 +1013,12 @@ window.ENRICH = {
     }
   },
   "prompt-engineering": {
+    flow: { title: "Anatomy of a good prompt", stages: [
+      { icon: "🎭", label: "Role", d: "Tell it who to be ('you are a tutor')." },
+      { icon: "🎯", label: "Task", d: "State exactly what you want." },
+      { icon: "📐", label: "Format", d: "Say how the answer should look." },
+      { icon: "💡", label: "Example", d: "Show one, and quality jumps." }
+    ] },
     analogy: "Like giving instructions to a **brilliant but painfully literal assistant**. It does exactly what you say, not what you meant — so vague asks get vague work. Say who it is, what you want, the format, and show one example, and the same model suddenly produces exactly what you need.",
     prerequisites: ["generative-ai-llm"],
     plainWords: "The prompt is your program for an LLM. Clear instructions, examples, and a defined output format dramatically change the quality — same model, wildly different results depending on how you ask.",
@@ -958,6 +1054,12 @@ window.ENRICH = {
     }
   },
   "rag-vs-finetuning": {
+    flow: { title: "Which one to reach for", stages: [
+      { icon: "🔄", label: "Knowledge changing?", d: "Yes → RAG (edit a doc, done)." },
+      { icon: "📎", label: "Need citations?", d: "Yes → RAG (points to the source)." },
+      { icon: "🎨", label: "Fixed style/format?", d: "Yes → fine-tune the behaviour." },
+      { icon: "⚖️", label: "Often both", d: "RAG for facts, fine-tune for style." }
+    ] },
     analogy: "**Look it up vs learn it by heart.** RAG hands the model an open reference to read at answer time — great for facts that change or must be cited. Fine-tuning makes it study until a behaviour is second nature — great for a fixed style or format, not for fresh facts. Changing knowledge? Reach for RAG.",
     prerequisites: ["rag"],
     plainWords: "Two ways to give an LLM new abilities: RAG feeds facts at query time (great for changing/private knowledge), fine-tuning bakes behaviour into the weights (great for fixed style or format). They solve different problems.",
@@ -975,6 +1077,12 @@ window.ENRICH = {
     }
   },
   "ai-applications": {
+    flow: { title: "A model inside a product", stages: [
+      { icon: "🧠", label: "Trained model", d: "Sits behind an endpoint, like any service." },
+      { icon: "📤", label: "App sends inputs", d: "Feature values over an API call." },
+      { icon: "🔮", label: "Gets a prediction", d: "The model returns a result." },
+      { icon: "🧩", label: "App uses it", d: "Business logic, UI and storage do the rest." }
+    ] },
     analogy: "Like **wiring the model into a product the same way you'd call any API**. Once trained, a model is just a function behind an endpoint: your app sends inputs, gets a prediction, and ordinary software (validation, storage, UI) does the rest. The ML is one component, not the whole system.",
     prerequisites: ["rag", "prompt-engineering"],
     plainWords: "Beyond chat, LLMs power agents that use tools: they decide what to do, call a function (search, calculator, API), read the result, and continue. The model is the reasoner; tools give it real-world reach.",
@@ -1021,6 +1129,12 @@ window.ENRICH = {
     }
   },
   "mlops-monitoring": {
+    flow: { title: "Watching a live model", stages: [
+      { icon: "📡", label: "Track", d: "Log predictions, inputs and latency." },
+      { icon: "📉", label: "Detect drift", d: "Flag when data or accuracy shifts." },
+      { icon: "🔔", label: "Alert", d: "Warn the team before it's an outage." },
+      { icon: "🔄", label: "Act", d: "Retrain or roll back." }
+    ] },
     analogy: "Like the **warning lights on a car dashboard** — or a smoke detector. You don't stare at the engine all day; you get alerted the moment accuracy, latency or input data drifts out of range, so you fix a small problem before it becomes an outage.",
     prerequisites: ["mlops-lifecycle"],
     plainWords: "After deploy, the world keeps changing. Data drift is when live inputs no longer look like the training data, silently eroding accuracy. Monitoring catches it so you can retrain before users notice.",
