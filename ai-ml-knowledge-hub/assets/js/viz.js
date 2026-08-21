@@ -598,6 +598,237 @@
     draw();
   };
 
+  // 13 ── Standardization (rescale to mean 0, std 1) ──────
+  VIZ["standardize"] = function (root) {
+    var base = [20, 35, 40, 45, 55], stretch = 1.5;
+    var cv = mkCanvas(root, Math.min(root.clientWidth || 640, 700), 220);
+    var readout = el("div", "viz-readout");
+    var sRaw = statBox("Raw std"), sZ = statBox("Standardized std");
+    readout.appendChild(sRaw); readout.appendChild(sZ);
+    var controls = el("div", "viz-controls");
+    controls.appendChild(slider({ label: "Stretch the raw data", min: 0.5, max: 4, step: 0.1, value: stretch, fmt: function (v) { return "×" + v.toFixed(1); }, onInput: function (v) { stretch = v; draw(); } }));
+    root.appendChild(readout); root.appendChild(controls);
+    root.appendChild(el("div", "viz-note", "Stretch the raw numbers however you like — the <b>standardized</b> version always lands centred at 0 with spread 1. That's why features on different scales become comparable."));
+    function draw() {
+      var m0 = mean(base);
+      var raw = base.map(function (v) { return m0 + (v - m0) * stretch; });
+      var mr = mean(raw), sr = std(raw);
+      var z = raw.map(function (v) { return (v - mr) / sr; });
+      sRaw._v.textContent = sr.toFixed(1); sZ._v.textContent = std(z).toFixed(2);
+      var ctx = cv.ctx, W = cv.w, H = cv.h; ctx.clearRect(0, 0, W, H);
+      var pad = 40;
+      function axis(y, label) {
+        ctx.strokeStyle = PAL.grid; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W - pad, y); ctx.stroke();
+        ctx.fillStyle = PAL.muted; ctx.font = "12px Figtree, sans-serif"; ctx.textAlign = "left"; ctx.fillText(label, pad, y - 22);
+      }
+      var rlo = Math.min.apply(null, raw), rhi = Math.max.apply(null, raw), rp = (rhi - rlo) * 0.15 + 1;
+      function Xr(v) { return pad + (v - (rlo - rp)) / ((rhi + rp) - (rlo - rp)) * (W - 2 * pad); }
+      axis(72, "Raw values (scale changes as you stretch)");
+      raw.forEach(function (v) { ctx.beginPath(); ctx.arc(Xr(v), 72, 7, 0, 7); ctx.fillStyle = PAL.accent; ctx.globalAlpha = .8; ctx.fill(); ctx.globalAlpha = 1; });
+      function Xz(v) { return pad + (Math.max(-3, Math.min(3, v)) + 3) / 6 * (W - 2 * pad); }
+      axis(168, "Standardized (always centred 0, spread 1)");
+      ctx.strokeStyle = PAL.grid; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(Xz(0), 150); ctx.lineTo(Xz(0), 186); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = PAL.muted; ctx.textAlign = "center"; ctx.fillText("0", Xz(0), 200);
+      z.forEach(function (v) { ctx.beginPath(); ctx.arc(Xz(v), 168, 7, 0, 7); ctx.fillStyle = PAL.sage; ctx.globalAlpha = .85; ctx.fill(); ctx.globalAlpha = 1; });
+    }
+    draw();
+  };
+
+  // 14 ── Classification decision boundary ────────────────
+  VIZ["decision-boundary"] = function (root) {
+    var angle = 20;
+    var rand = rng(8), A = [], B = [];
+    for (var i = 0; i < 40; i++) { A.push([0.34 + gauss(rand) * 0.10, 0.62 + gauss(rand) * 0.10]); B.push([0.66 + gauss(rand) * 0.10, 0.40 + gauss(rand) * 0.10]); }
+    var cv = mkCanvas(root, Math.min(root.clientWidth || 520, 520), 300);
+    var readout = el("div", "viz-readout"); var sAcc = statBox("Accuracy"); readout.appendChild(sAcc);
+    var controls = el("div", "viz-controls");
+    controls.appendChild(slider({ label: "Tilt the boundary line", min: -80, max: 80, step: 2, value: angle, fmt: function (v) { return v + "°"; }, onInput: function (v) { angle = v; draw(); } }));
+    root.appendChild(readout); root.appendChild(controls);
+    root.appendChild(el("div", "viz-note", "The line is the model's decision boundary: one side is predicted class A, the other class B. Tilt it to separate the two clouds as cleanly as you can — that's what training does automatically."));
+    function side(p) { var a = angle * Math.PI / 180, nx = Math.sin(a), ny = -Math.cos(a); return (p[0] - 0.5) * nx + (p[1] - 0.5) * ny > 0; }
+    function draw() {
+      var correct = 0, total = A.length + B.length;
+      A.forEach(function (p) { if (side(p) === true) correct++; });
+      B.forEach(function (p) { if (side(p) === false) correct++; });
+      sAcc._v.textContent = (correct / total * 100).toFixed(0) + "%";
+      var ctx = cv.ctx, W = cv.w, H = cv.h; ctx.clearRect(0, 0, W, H);
+      function X(v) { return v * W; } function Y(v) { return v * H; }
+      var a = angle * Math.PI / 180, dx = Math.cos(a), dy = Math.sin(a);
+      ctx.strokeStyle = PAL.ink; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(X(0.5 - dx), Y(0.5 - dy)); ctx.lineTo(X(0.5 + dx), Y(0.5 + dy)); ctx.stroke();
+      A.forEach(function (p) { ctx.beginPath(); ctx.arc(X(p[0]), Y(p[1]), 5, 0, 7); ctx.fillStyle = PAL.accent; ctx.globalAlpha = .8; ctx.fill(); ctx.globalAlpha = 1; });
+      B.forEach(function (p) { ctx.beginPath(); ctx.arc(X(p[0]), Y(p[1]), 5, 0, 7); ctx.fillStyle = PAL.sage; ctx.globalAlpha = .8; ctx.fill(); ctx.globalAlpha = 1; });
+      ctx.fillStyle = PAL.accent700; ctx.font = "600 12px Figtree, sans-serif"; ctx.textAlign = "left"; ctx.fillText("● class A", 12, 18);
+      ctx.fillStyle = PAL.sage700; ctx.fillText("● class B", 92, 18);
+    }
+    draw();
+  };
+
+  // 15 ── Word-embedding map (meaning = location) ──────────
+  function makeWordMap(root, mode) {
+    var words = [
+      { w: "dog", x: .18, y: .25, g: 0 }, { w: "cat", x: .27, y: .32, g: 0 }, { w: "lion", x: .15, y: .41, g: 0 },
+      { w: "king", x: .76, y: .22, g: 1 }, { w: "queen", x: .84, y: .30, g: 1 }, { w: "prince", x: .72, y: .37, g: 1 },
+      { w: "Paris", x: .22, y: .80, g: 2 }, { w: "London", x: .31, y: .72, g: 2 }, { w: "Tokyo", x: .15, y: .69, g: 2 },
+      { w: "pizza", x: .80, y: .76, g: 3 }, { w: "sushi", x: .86, y: .67, g: 3 }, { w: "bread", x: .71, y: .80, g: 3 }
+    ];
+    var colors = [PAL.accent, PAL.sage, "#5b7fa6", "#a65b8f"];
+    var sel = mode === "search" ? 3 : 0, k = 3;
+    var cv = mkCanvas(root, Math.min(root.clientWidth || 560, 560), 320);
+    cv.canvas.style.cursor = "pointer";
+    cv.canvas.addEventListener("click", function (e) {
+      var r = cv.canvas.getBoundingClientRect();
+      var mx = (e.clientX - r.left) / r.width, my = (e.clientY - r.top) / r.height, best = 0, bd = 1e9;
+      words.forEach(function (o, i) { var d = (o.x - mx) * (o.x - mx) + (o.y - my) * (o.y - my); if (d < bd) { bd = d; best = i; } });
+      sel = best; draw();
+    });
+    root.appendChild(el("div", "viz-note", mode === "search"
+      ? "Click a word to use it as a <b>search</b>: the map lights up its nearest words by <b>meaning</b>, not spelling. That's how vector search finds relevant text even when the words don't match."
+      : "Every word is a point, and words with similar meaning sit close together. Click any word to light up its nearest neighbours — the model's sense of 'related'."));
+    function draw() {
+      var ctx = cv.ctx, W = cv.w, H = cv.h; ctx.clearRect(0, 0, W, H);
+      function X(v) { return 30 + v * (W - 60); } function Y(v) { return 20 + v * (H - 56); }
+      var s = words[sel];
+      var near = words.map(function (o, i) { return { i: i, d: Math.hypot(o.x - s.x, o.y - s.y) }; })
+        .filter(function (o) { return o.i !== sel; }).sort(function (a, b) { return a.d - b.d; }).slice(0, k).map(function (o) { return o.i; });
+      ctx.strokeStyle = PAL.accent; ctx.lineWidth = 2; ctx.globalAlpha = .5;
+      near.forEach(function (i) { ctx.beginPath(); ctx.moveTo(X(s.x), Y(s.y)); ctx.lineTo(X(words[i].x), Y(words[i].y)); ctx.stroke(); });
+      ctx.globalAlpha = 1;
+      words.forEach(function (o, i) {
+        var isSel = i === sel, isNear = near.indexOf(i) > -1, on = isSel || isNear;
+        ctx.beginPath(); ctx.arc(X(o.x), Y(o.y), isSel ? 9 : 6, 0, 7); ctx.fillStyle = colors[o.g]; ctx.globalAlpha = on ? 1 : .45; ctx.fill(); ctx.globalAlpha = 1;
+        ctx.fillStyle = PAL.ink; ctx.font = (isSel ? "600 13px" : "12px") + " Figtree, sans-serif"; ctx.textAlign = "center"; ctx.globalAlpha = on ? 1 : .5;
+        ctx.fillText(o.w, X(o.x), Y(o.y) - 11); ctx.globalAlpha = 1;
+      });
+      ctx.fillStyle = PAL.accent700; ctx.font = "600 12px Figtree, sans-serif"; ctx.textAlign = "left";
+      ctx.fillText((mode === "search" ? "search: " : "selected: ") + s.w + "  →  nearest: " + near.map(function (i) { return words[i].w; }).join(", "), 30, H - 8);
+    }
+    draw();
+  }
+  VIZ["embedding-map"] = function (root) { makeWordMap(root, "map"); };
+  VIZ["vector-search"] = function (root) { makeWordMap(root, "search"); };
+
+  // 16 ── Activation functions ────────────────────────────
+  VIZ["activation"] = function (root) {
+    var fn = "ReLU";
+    var cv = mkCanvas(root, Math.min(root.clientWidth || 560, 560), 250);
+    var controls = el("div", "viz-controls");
+    ["Sigmoid", "tanh", "ReLU"].forEach(function (name) { controls.appendChild(button(name, function () { fn = name; hi(); draw(); })); });
+    root.appendChild(controls);
+    var note = el("div", "viz-note", ""); root.appendChild(note);
+    var notes = {
+      Sigmoid: "Squashes any input into 0–1 — handy for a probability, but very large or small inputs barely move the output.",
+      tanh: "Like sigmoid but centred at 0 (−1 to 1), which often trains a little better.",
+      ReLU: "Simplest and most used: let positives through, zero out negatives. Cheap, and it works well in deep networks."
+    };
+    function apply(x) { if (fn === "Sigmoid") return 1 / (1 + Math.exp(-x)); if (fn === "tanh") return Math.tanh(x); return Math.max(0, x); }
+    function hi() { Array.prototype.forEach.call(controls.querySelectorAll("button"), function (b) { var on = b.textContent === fn; b.classList.toggle("btn-primary", on); b.classList.toggle("btn-secondary", !on); }); note.innerHTML = notes[fn]; }
+    function draw() {
+      var ctx = cv.ctx, W = cv.w, H = cv.h; ctx.clearRect(0, 0, W, H);
+      var pad = 30, xlo = -5, xhi = 5, ylo = -1.2, yhi = 1.2; if (fn === "ReLU") { ylo = -0.5; yhi = 5; }
+      function X(v) { return pad + (v - xlo) / (xhi - xlo) * (W - 2 * pad); }
+      function Y(v) { return (H - pad) - (v - ylo) / (yhi - ylo) * (H - 2 * pad); }
+      ctx.strokeStyle = PAL.grid; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(pad, Y(0)); ctx.lineTo(W - pad, Y(0)); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(X(0), pad); ctx.lineTo(X(0), H - pad); ctx.stroke();
+      ctx.strokeStyle = PAL.accent; ctx.lineWidth = 2.5; ctx.beginPath();
+      for (var x = xlo; x <= xhi; x += 0.05) { var px = X(x), py = Y(Math.max(ylo, Math.min(yhi, apply(x)))); if (x === xlo) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
+      ctx.stroke();
+    }
+    hi(); draw();
+  };
+
+  // 17 ── p-value / hypothesis test ───────────────────────
+  VIZ["p-value"] = function (root) {
+    var z = 1.0;
+    var cv = mkCanvas(root, Math.min(root.clientWidth || 620, 700), 240);
+    var readout = el("div", "viz-readout"); var sP = statBox("p-value"), sV = statBox("Verdict");
+    readout.appendChild(sP); readout.appendChild(sV);
+    var controls = el("div", "viz-controls");
+    controls.appendChild(slider({ label: "How far the result is from 'no effect'", min: 0, max: 4, step: 0.1, value: z, fmt: function (v) { return v.toFixed(1) + "σ"; }, onInput: function (v) { z = v; draw(); } }));
+    root.appendChild(readout); root.appendChild(controls);
+    root.appendChild(el("div", "viz-note", "The bell is what you'd expect if <b>nothing</b> is going on. The shaded tails are how likely a result this extreme would be by pure chance — the <b>p-value</b>. Small (&lt;0.05) → too surprising to be luck, so you reject 'no effect'."));
+    function erf(x) { var t = 1 / (1 + 0.3275911 * Math.abs(x)); var y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x); return x < 0 ? -y : y; }
+    function pval(zv) { var Phi = 0.5 * (1 + erf(zv / Math.SQRT2)); return 2 * (1 - Phi); }
+    function draw() {
+      var p = pval(z); sP._v.textContent = p.toFixed(3); sV._v.textContent = p < 0.05 ? "Reject null" : "Not enough";
+      var ctx = cv.ctx, W = cv.w, H = cv.h; ctx.clearRect(0, 0, W, H);
+      var pad = 24, axisY = H - 28, lo = -4, hi = 4, top = 20;
+      function X(v) { return pad + (v - lo) / (hi - lo) * (W - 2 * pad); }
+      function pdf(x) { return Math.exp(-0.5 * x * x); }
+      function Y(pp) { return axisY - pp * (axisY - top); }
+      ctx.fillStyle = "rgba(198,113,57,0.25)";
+      function shade(from, to) { ctx.beginPath(); ctx.moveTo(X(from), axisY); for (var x = from; x <= to; x += 0.05) ctx.lineTo(X(x), Y(pdf(x))); ctx.lineTo(X(to), axisY); ctx.closePath(); ctx.fill(); }
+      shade(z, 4); shade(-4, -z);
+      ctx.strokeStyle = PAL.accent; ctx.lineWidth = 2.5; ctx.beginPath();
+      for (var xx = lo; xx <= hi; xx += 0.05) { var px = X(xx), py = Y(pdf(xx)); if (xx === lo) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
+      ctx.stroke();
+      ctx.strokeStyle = PAL.grid; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(pad, axisY); ctx.lineTo(W - pad, axisY); ctx.stroke();
+      ctx.strokeStyle = PAL.ink; ctx.lineWidth = 1.5; ctx.setLineDash([4, 3]);
+      [z, -z].forEach(function (v) { ctx.beginPath(); ctx.moveTo(X(v), top); ctx.lineTo(X(v), axisY); ctx.stroke(); });
+      ctx.setLineDash([]);
+      ctx.fillStyle = PAL.ink; ctx.font = "600 11px Figtree, sans-serif"; ctx.textAlign = "center"; ctx.fillText("±" + z.toFixed(1) + "σ", X(z), top - 4);
+    }
+    draw();
+  };
+
+  // 18 ── Probability & the law of large numbers ──────────
+  VIZ["probability"] = function (root) {
+    var trials = 50, seed = 1;
+    var cv = mkCanvas(root, Math.min(root.clientWidth || 560, 560), 220);
+    var readout = el("div", "viz-readout"); var sH = statBox("Heads %"), sExp = statBox("Expected");
+    readout.appendChild(sH); readout.appendChild(sExp);
+    var controls = el("div", "viz-controls");
+    controls.appendChild(slider({ label: "Number of coin flips", min: 10, max: 2000, step: 10, value: trials, onInput: function (v) { trials = v; draw(); } }));
+    var btns = el("div", "viz-controls"); btns.appendChild(button("Flip again", function () { seed = Math.floor(Math.random() * 9999) + 1; draw(); }));
+    root.appendChild(readout); root.appendChild(controls); root.appendChild(btns);
+    root.appendChild(el("div", "viz-note", "A fair coin is 50/50, but a few flips can look lopsided. Increase the flips: the measured heads % settles toward 50% — the law of large numbers, and why models need enough data."));
+    function draw() {
+      var rand = rng(seed), heads = 0; for (var i = 0; i < trials; i++) if (rand() < 0.5) heads++;
+      sH._v.textContent = (heads / trials * 100).toFixed(1) + "%"; sExp._v.textContent = "50%";
+      var ctx = cv.ctx, W = cv.w, H = cv.h; ctx.clearRect(0, 0, W, H);
+      var pad = 40, baseY = H - 30, barW = (W - 2 * pad) / 2 - 20, tails = trials - heads;
+      function bar(x, frac, color, label, val) {
+        var h = frac * (baseY - 30); ctx.fillStyle = color; ctx.globalAlpha = .85; ctx.fillRect(x, baseY - h, barW, h); ctx.globalAlpha = 1;
+        ctx.fillStyle = PAL.ink; ctx.font = "600 13px Figtree, sans-serif"; ctx.textAlign = "center"; ctx.fillText(val, x + barW / 2, baseY - h - 6);
+        ctx.fillStyle = PAL.muted; ctx.font = "12px Figtree, sans-serif"; ctx.fillText(label, x + barW / 2, baseY + 16);
+      }
+      bar(pad, heads / trials, PAL.sage, "Heads", heads);
+      bar(pad + barW + 40, tails / trials, PAL.accent, "Tails", tails);
+      var y = baseY - 0.5 * (baseY - 30);
+      ctx.strokeStyle = PAL.ink; ctx.setLineDash([5, 3]); ctx.globalAlpha = .5; ctx.beginPath(); ctx.moveTo(pad - 10, y); ctx.lineTo(W - pad + 10, y); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+      ctx.fillStyle = PAL.muted; ctx.textAlign = "left"; ctx.font = "11px Figtree, sans-serif"; ctx.fillText("50%", W - pad + 2, y - 3);
+    }
+    draw();
+  };
+
+  // 19 ── Feature engineering lift ────────────────────────
+  VIZ["feature-lift"] = function (root) {
+    var engineered = false, rand = rng(6), A = [], B = [], Ae = [], Be = [];
+    for (var i = 0; i < 30; i++) { A.push(0.5 + gauss(rand) * 0.13); B.push(0.5 + gauss(rand) * 0.13); Ae.push(0.30 + gauss(rand) * 0.06); Be.push(0.70 + gauss(rand) * 0.06); }
+    var cv = mkCanvas(root, Math.min(root.clientWidth || 620, 700), 160);
+    var controls = el("div", "viz-controls");
+    controls.appendChild(button("Add the engineered feature", function () { engineered = !engineered; draw(); update(); }));
+    root.appendChild(controls);
+    var note = el("div", "viz-note", ""); root.appendChild(note);
+    function update() {
+      note.innerHTML = engineered
+        ? "With a smarter feature (e.g. spend-per-month), the two classes pull <b>apart</b> — now a simple straight line can separate them."
+        : "On the raw feature the two classes <b>overlap</b> — no line separates them well. Click the button to engineer a better feature.";
+      controls.querySelector("button").textContent = engineered ? "Show the raw feature" : "Add the engineered feature";
+    }
+    function draw() {
+      var ctx = cv.ctx, W = cv.w, H = cv.h; ctx.clearRect(0, 0, W, H);
+      var pad = 40, y = 84; function X(v) { return pad + v * (W - 2 * pad); }
+      ctx.strokeStyle = PAL.grid; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W - pad, y); ctx.stroke();
+      var av = engineered ? Ae : A, bv = engineered ? Be : B;
+      av.forEach(function (v) { ctx.beginPath(); ctx.arc(X(v), y - 12, 5, 0, 7); ctx.fillStyle = PAL.accent; ctx.globalAlpha = .7; ctx.fill(); ctx.globalAlpha = 1; });
+      bv.forEach(function (v) { ctx.beginPath(); ctx.arc(X(v), y + 12, 5, 0, 7); ctx.fillStyle = PAL.sage; ctx.globalAlpha = .7; ctx.fill(); ctx.globalAlpha = 1; });
+      ctx.fillStyle = PAL.accent700; ctx.font = "600 12px Figtree, sans-serif"; ctx.textAlign = "left"; ctx.fillText("● class A", pad, 24);
+      ctx.fillStyle = PAL.sage700; ctx.fillText("● class B", pad + 82, 24);
+    }
+    draw(); update();
+  };
+
   window.VIZ = VIZ;
   window.__loadVizPalette = loadPalette;
   loadPalette();

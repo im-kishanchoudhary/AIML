@@ -36,6 +36,7 @@ window.ENRICH = {
     }
   },
   "standardization": {
+    viz: "standardize",
     analogy: "Like **converting every price into one currency** before comparing. A €5 coffee and a ¥600 coffee only compare fairly once they're on the same scale. Features measured in dollars, years and counts need the same treatment — otherwise the biggest-numbered column wins by accident, not because it matters most.",
     prerequisites: ["variance-std", "numpy-vectorization"],
     plainWords: "Different features use different rulers — dollars vs years vs counts. Standardizing puts them all on the same ruler so no feature wins just because its numbers happen to be bigger.",
@@ -102,6 +103,7 @@ window.ENRICH = {
     }
   },
   "tokens-embeddings": {
+    viz: "embedding-map",
     analogy: "Like giving every word a **GPS coordinate in 'meaning space'**, so related words sit close together — 'king' near 'queen', 'Paris' near 'France'. The model can then do arithmetic with meaning instead of matching exact letters, which is why search finds 'refund' even when you typed 'money back'.",
     prerequisites: ["generative-ai-llm"],
     plainWords: "An embedding is a way of giving every word or sentence a set of coordinates, so that things which mean similar things end up near each other on a map — 'car' and 'automobile' become neighbours even though they share no letters.",
@@ -526,6 +528,7 @@ window.ENRICH = {
     }
   },
   "probability-basics": {
+    viz: "probability",
     analogy: "Like a **weather forecast's '70% chance of rain'**. It doesn't say yes or no — it puts a number between 0 and 1 on how likely something is. Models speak this language too: a churn model says '0.83 likely to leave', not a flat yes.",
     prerequisites: ["descriptive-stats"],
     plainWords: "Probability puts a number from 0 to 1 on how likely something is. The key beginner trap is conditional probability — how a new piece of evidence updates the odds (the heart of Bayes and of ML).",
@@ -543,6 +546,7 @@ window.ENRICH = {
     }
   },
   "hypothesis-testing": {
+    viz: "p-value",
     analogy: "Like a **courtroom**. The default (the *null hypothesis*) is 'innocent — nothing is going on'. Your data is the evidence. The **p-value** is how surprising that evidence would be *if the defendant were truly innocent*; small enough, and you reject 'innocent'. You never *prove* innocence — you just fail to convict.",
     prerequisites: ["normal-distribution", "probability-basics"],
     plainWords: "A hypothesis test asks: could this difference be just luck? The p-value is the chance of seeing a result this extreme if nothing were really going on. Small p (<0.05) → probably a real effect.",
@@ -578,6 +582,7 @@ window.ENRICH = {
 
   /* ---------- Machine learning ---------- */
   "classification": {
+    viz: "decision-boundary",
     analogy: "Like **sorting incoming mail into labelled bins** — spam vs not, approve vs review, churn vs stay. The model learns from past sorted mail what belongs in each bin, then drops each new item into the most likely one — usually with a confidence score.",
     prerequisites: ["ml-fundamentals", "train-test-split"],
     plainWords: "Classification predicts a category, not a number: spam or not, which digit, which disease. The model outputs a probability per class and you pick the most likely.",
@@ -595,6 +600,7 @@ window.ENRICH = {
     }
   },
   "feature-engineering": {
+    viz: "feature-lift",
     analogy: "Like **giving a detective better clues**. The raw case file (the columns) might not crack it, but combine a few facts — 'spend per month of tenure', 'days since last login' — and the pattern jumps out. Often a smart feature beats a fancier model.",
     prerequisites: ["pandas-transform"],
     plainWords: "Models learn from the columns you give them. Feature engineering is crafting better columns — ratios, dates split into parts, categories turned into numbers — often worth more than a fancier algorithm.",
@@ -825,6 +831,7 @@ window.ENRICH = {
     }
   },
   "activation-loss": {
+    viz: "activation",
     analogy: "Like a **dimmer switch plus a scorecard**. The *activation function* is a dimmer on each neuron — it decides how much signal passes and lets the network learn curves, not just straight lines. The *loss function* is the scorecard — one number saying how wrong the output was, which training then works to shrink.",
     prerequisites: ["neural-networks"],
     plainWords: "Activation functions add the non-linearity that lets deep nets model complex things (without them, stacked layers collapse to one line). The loss function scores how wrong a prediction is — the thing training tries to shrink.",
@@ -933,6 +940,7 @@ window.ENRICH = {
     }
   },
   "vector-search": {
+    viz: "vector-search",
     analogy: "Like a **librarian who finds books by vibe, not exact title**. Ask for 'something about getting my money back' and keyword search shrugs; meaning-based search hands you the refund policy. It matches by *what the text means* — using the embedding vectors — not by the letters.",
     prerequisites: ["tokens-embeddings"],
     plainWords: "Vector search finds items by meaning, not keywords: embed everything into vectors, then return the ones closest to your query's vector. It's what powers semantic search and the retrieval step in RAG.",
