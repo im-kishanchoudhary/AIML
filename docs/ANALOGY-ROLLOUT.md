@@ -77,14 +77,25 @@ Legend: ✅ done · ⬜ pending · **Flow** = gets an interactive flow strip.
 | mlops-lifecycle | Running the restaurant after opening night — keep it fresh | ✅ | ✅ |
 | mlops-monitoring | Dashboard warning lights / a smoke detector | — | ✅ |
 
-**All 45 topics done.** 🎉 11 flows in total.
+**All 45 topics done.** 🎉
 
-## Batch 5 — Glossary (pending)
+## Batch 5 — Glossary (done)
 
-All 37 glossary terms get a one-line real-world analogy appended to their
-definition. Batched last, after the topic pages land.
+All 37 glossary terms now carry a one-line real-world analogy under their
+definition, rendered by `renderGlossary`.
+
+## Beginner-visual pass (done)
+
+- **Every topic has a picture:** 19 interactive Canvas visualizations + 30 flow
+  strips (with overlap); zero topics without a visual.
+- **8 new interactive visualizations** for the hardest abstract topics
+  (`standardize`, `decision-boundary`, `embedding-map`, `vector-search`,
+  `activation`, `p-value`, `probability`, `feature-lift`) in `assets/js/viz.js`.
+- **Beginner-first layout:** Learn topics lead with analogy → visual → plain
+  words → formal sections.
+- **Projects:** per-step "In plain words" on all 7 projects (42/42 steps).
 
 ---
 
-**Progress:** 45 / 45 topics ✅ · 0 / 37 glossary terms. Only the glossary
-batch remains.
+**Progress:** 45 / 45 topics ✅ · 37 / 37 glossary ✅ · 42 / 42 project steps ✅.
+Every surface of the hub now carries a real-world analogy and a picture.

@@ -47,6 +47,7 @@ window.PROJECTS = [
         title: "Make a dataset to work with",
         topic: "pandas-dataframe",
         detail: "Generate a small customer table so the whole project runs offline. Each row is a customer; `churn` is what we'll predict.",
+        analogy: "**Write the practice workbook** — fake customers with the answer (did they leave?) already filled in, so there's something to learn from.",
         code: "import numpy as np, pandas as pd\nrng = np.random.default_rng(0)\nn = 1200\ndf = pd.DataFrame({\n  'tenure_months': rng.integers(1, 72, n),\n  'monthly_charge': rng.normal(70, 25, n).round(2),\n  'support_calls': rng.poisson(1.5, n),\n  'is_month_to_month': rng.integers(0, 2, n),\n})\n# churn is likelier for new, month-to-month, high-support-call customers\nrisk = (df.is_month_to_month*1.2 + df.support_calls*0.4 - df.tenure_months*0.04)\ndf['churn'] = (rng.random(n) < 1/(1+np.exp(-risk+1))).astype(int)\nprint(df.head())\nprint('churn rate:', df.churn.mean().round(3))",
         checkpoint: "A 1,200-row table prints, with a churn rate around 0.35–0.45."
       },
@@ -54,6 +55,7 @@ window.PROJECTS = [
         title: "Clean and sanity-check",
         topic: "pandas-cleaning",
         detail: "Real data has gaps. Practise the habit now: check types, look for missing values, and eyeball the class balance before modelling.",
+        analogy: "**Tidy the desk before work** — no gaps or weird values left to trip the model up.",
         code: "print(df.dtypes)\nprint('missing:\\n', df.isna().sum())\nprint(df.describe().round(1))\n# no NaNs here, but this is where you'd fillna / drop in real data",
         checkpoint: "Zero missing values, and numeric ranges that look sane (tenure 1–72, charges near 70)."
       },
@@ -61,6 +63,7 @@ window.PROJECTS = [
         title: "Engineer a feature",
         topic: "feature-engineering",
         detail: "Models learn from signal you expose. Add spend-per-tenure — a ratio that often separates churners from loyal customers better than either column alone.",
+        analogy: "**Hand the model a sharper clue** — spend-per-tenure often reveals churners that the plain columns hide.",
         code: "df['charge_per_tenure'] = (df.monthly_charge / (df.tenure_months + 1)).round(3)\nfeatures = ['tenure_months','monthly_charge','support_calls','is_month_to_month','charge_per_tenure']\nX, y = df[features], df['churn']\nprint(X.head())",
         checkpoint: "`X` now has five columns including the new `charge_per_tenure`."
       },
@@ -68,6 +71,7 @@ window.PROJECTS = [
         title: "Split before you touch a model",
         topic: "train-test-split",
         detail: "Hold out a test set FIRST — it's your only honest estimate of real-world performance. `stratify` keeps the churn rate equal in both halves.",
+        analogy: "**Seal one exam paper away** so the final score is honest, not something the model already peeked at.",
         code: "from sklearn.model_selection import train_test_split\nX_tr, X_te, y_tr, y_te = train_test_split(\n  X, y, test_size=0.25, stratify=y, random_state=0)\nprint('train:', X_tr.shape, ' test:', X_te.shape)",
         checkpoint: "~900 training rows and ~300 test rows, printed."
       },
@@ -75,6 +79,7 @@ window.PROJECTS = [
         title: "Scale, then train",
         topic: "standardization",
         detail: "Fit the scaler on TRAIN only (fitting on all data leaks the test set), then train a simple, strong baseline classifier.",
+        analogy: "**Put every feature on the same ruler, then let the model study** the training examples.",
         code: "from sklearn.preprocessing import StandardScaler\nfrom sklearn.linear_model import LogisticRegression\nscaler = StandardScaler().fit(X_tr)          # fit on train only\nmodel = LogisticRegression(max_iter=1000)\nmodel.fit(scaler.transform(X_tr), y_tr)\nprint('trained')",
         checkpoint: "It prints `trained` with no convergence warning."
       },
@@ -82,6 +87,7 @@ window.PROJECTS = [
         title: "Evaluate honestly",
         topic: "model-evaluation",
         detail: "Accuracy alone lies on imbalanced data. Read ROC-AUC and the full report — precision and recall tell you what the model actually catches.",
+        analogy: "**Exam day on unseen customers** — accuracy alone flatters; precision and recall show what it really catches and misses.",
         code: "from sklearn.metrics import roc_auc_score, classification_report\nproba = model.predict_proba(scaler.transform(X_te))[:,1]\nprint('ROC-AUC:', round(roc_auc_score(y_te, proba), 3))\nprint(classification_report(y_te, (proba>0.5).astype(int)))",
         checkpoint: "ROC-AUC around 0.78–0.85 — clearly better than 0.5 (random)."
       },
@@ -89,6 +95,7 @@ window.PROJECTS = [
         title: "Read what drives it",
         topic: "classification",
         detail: "A logistic model's coefficients are interpretable: positive pushes toward churn, negative toward staying. This is how you explain a model to a stakeholder.",
+        analogy: "**Ask the model to show its reasoning** — which signals push a customer out the door, and which keep them.",
         code: "import pandas as pd\ncoef = pd.Series(model.coef_[0], index=features).sort_values()\nprint(coef.round(3))\n# expect: is_month_to_month & support_calls positive; tenure negative",
         checkpoint: "Coefficients rank the drivers — month-to-month and support calls raise churn risk, tenure lowers it."
       }
@@ -132,6 +139,7 @@ window.PROJECTS = [
         title: "Understand the pieces",
         topic: "generative-ai-llm",
         detail: "An LLM only knows its training data. RAG feeds it fresh, private context at question time so it can answer things it was never trained on — without retraining.",
+        analogy: "**A librarian who fetches the right pages first, then answers** — instead of reciting from memory and bluffing.",
         code: "# Mental model of the loop we're building:\n#   question -> embed -> find nearest chunks -> stuff into prompt -> LLM answers\n# No fine-tuning. Update knowledge by editing documents.\nprint('RAG = Retrieval-Augmented Generation')",
         checkpoint: "You can say the four stages of the loop out loud: embed, retrieve, augment, generate."
       },
@@ -139,6 +147,7 @@ window.PROJECTS = [
         title: "Chunk your documents",
         topic: "rag",
         detail: "Retrieval works on pieces, not whole files. Split documents into small, self-contained chunks so each retrieved piece is focused.",
+        analogy: "**Tear the manual into index cards**, so each card answers just one thing.",
         code: "docs = [\n  'Refunds are available within 30 days of purchase with a receipt.',\n  'Our support team is available Monday to Friday, 9am to 6pm.',\n  'The Pro plan includes unlimited projects and priority support.',\n  'Data is encrypted at rest and in transit using AES-256.',\n]\nchunks = docs  # already short; real docs: split ~200-500 tokens each\nprint(len(chunks), 'chunks ready')",
         checkpoint: "A list of short, standalone chunks — each answers one thing."
       },
@@ -146,6 +155,7 @@ window.PROJECTS = [
         title: "Embed the chunks",
         topic: "tokens-embeddings",
         detail: "An embedding turns text into a vector where similar meanings sit close together. Embed every chunk once and keep the vectors.",
+        analogy: "**Give every card a 'meaning fingerprint'** so similar ones are easy to find later.",
         code: "# Using OpenAI-style embeddings (swap for any provider / local model):\n# from openai import OpenAI; client = OpenAI()\n# def embed(text):\n#     return client.embeddings.create(\n#         model='text-embedding-3-small', input=text).data[0].embedding\n#\n# For an offline demo, fake it with a hashing embedding:\nimport numpy as np\ndef embed(text):\n    v = np.zeros(64)\n    for w in text.lower().split():\n        v[hash(w) % 64] += 1\n    return v / (np.linalg.norm(v) + 1e-9)\nchunk_vecs = np.array([embed(c) for c in chunks])\nprint('embedded:', chunk_vecs.shape)",
         checkpoint: "A matrix of one vector per chunk (here 4 × 64)."
       },
@@ -153,6 +163,7 @@ window.PROJECTS = [
         title: "Retrieve by similarity",
         topic: "vector-search",
         detail: "For a question, embed it and rank chunks by cosine similarity. The top-k are your evidence. In production a vector DB does this at scale.",
+        analogy: "**For a question, pull the few cards that actually answer it** — the evidence, not the whole box.",
         code: "def retrieve(question, k=2):\n    q = embed(question)\n    sims = chunk_vecs @ q            # cosine (vectors are normalized)\n    top = sims.argsort()[::-1][:k]\n    return [chunks[i] for i in top]\n\nctx = retrieve('how long do I have to get a refund?')\nprint(ctx)",
         checkpoint: "The refund chunk is retrieved first for a refund question."
       },
@@ -160,6 +171,7 @@ window.PROJECTS = [
         title: "Augment the prompt & answer",
         topic: "prompt-engineering",
         detail: "Put the retrieved context in the prompt and instruct the model to answer ONLY from it — this is what grounds the answer and enables citations.",
+        analogy: "**Hand those cards to the writer with a rule:** answer only from these, and say where it came from.",
         code: "def answer(question):\n    ctx = retrieve(question)\n    prompt = (\n      'Answer using ONLY the context. If it is not there, say you do not know.\\n\\n'\n      + 'Context:\\n- ' + '\\n- '.join(ctx)\n      + f'\\n\\nQuestion: {question}\\nAnswer:')\n    # return client.chat.completions.create(...)  # send prompt to your LLM\n    return prompt\nprint(answer('when is support open?'))",
         checkpoint: "The assembled prompt contains the right context and a grounding instruction."
       },
@@ -167,6 +179,7 @@ window.PROJECTS = [
         title: "Know when to choose RAG",
         topic: "rag-vs-finetuning",
         detail: "RAG updates the moment you edit a document; fine-tuning bakes knowledge into weights and needs retraining. For changing or private facts, RAG wins.",
+        analogy: "**Facts that change or need a citation → look it up (RAG)**; a fixed style → learn it by heart (fine-tune).",
         code: "# Rule of thumb:\n#   RAG        -> facts that change, must cite sources, private data\n#   Fine-tune  -> fixed style/format/behaviour, not new facts\nprint('Changing knowledge? Reach for RAG.')",
         checkpoint: "You can justify RAG over fine-tuning for a knowledge-base bot in one sentence."
       }
@@ -210,6 +223,7 @@ window.PROJECTS = [
         title: "Create a sales history",
         topic: "pandas-loading",
         detail: "Generate three years of monthly sales with an upward trend and a seasonal bump — enough structure for a model to learn.",
+        analogy: "**Three years of a shop's sales history** — with a growth trend and a seasonal bump to spot.",
         code: "import numpy as np, pandas as pd\nrng = np.random.default_rng(1)\nmonths = pd.date_range('2022-01-01', periods=36, freq='MS')\ntrend = np.linspace(100, 160, 36)\nseason = 15*np.sin(2*np.pi*(months.month-1)/12)\nsales = (trend + season + rng.normal(0, 5, 36)).round(1)\ndf = pd.DataFrame({'month': months, 'sales': sales})\nprint(df.head())",
         checkpoint: "36 rows of monthly sales, values roughly in the 90–180 range."
       },
@@ -217,6 +231,7 @@ window.PROJECTS = [
         title: "Look before you model",
         topic: "descriptive-stats",
         detail: "Always describe a series first — the level, the spread, and the obvious pattern. It tells you what a model must capture.",
+        analogy: "**Eyeball the numbers first** — how big, how spread, what pattern the model will need to capture.",
         code: "print(df.sales.describe().round(1))\nprint('year-over-year growth:',\n      round(df.sales[-12:].mean() - df.sales[:12].mean(), 1))",
         checkpoint: "A clear positive year-over-year difference confirms the upward trend."
       },
@@ -224,6 +239,7 @@ window.PROJECTS = [
         title: "Build lag & calendar features",
         topic: "feature-engineering",
         detail: "A forecaster predicts from the past. Expose last month's value (lag-1), the same month a year ago (lag-12), and the month number for seasonality.",
+        analogy: "**Give the forecaster a memory:** last month, the same month last year, and which month it is now.",
         code: "df['lag1'] = df.sales.shift(1)\ndf['lag12'] = df.sales.shift(12)\ndf['month_num'] = df.month.dt.month\nd = df.dropna().reset_index(drop=True)   # first 12 rows lack lag12\nprint(d[['month','sales','lag1','lag12','month_num']].head())",
         checkpoint: "A feature table with lag1, lag12 and month_num, no NaNs."
       },
@@ -231,6 +247,7 @@ window.PROJECTS = [
         title: "Split by time, not at random",
         topic: "train-test-split",
         detail: "Time series must NOT be shuffled — you can't train on the future. Train on the earlier months, test on the most recent ones.",
+        analogy: "**You can't practise on the future** — train on the earlier months, test on the latest ones.",
         code: "feat = ['lag1','lag12','month_num']\ncut = len(d) - 6                 # last 6 months = test\nX_tr, y_tr = d[feat][:cut], d.sales[:cut]\nX_te, y_te = d[feat][cut:], d.sales[cut:]\nprint('train months:', len(X_tr), ' test months:', len(X_te))",
         checkpoint: "The final 6 months are held out as the test window."
       },
@@ -238,6 +255,7 @@ window.PROJECTS = [
         title: "Fit a regression forecaster",
         topic: "regression",
         detail: "A regression model maps the lag/calendar features to next month's sales. Simple and interpretable — the right first forecaster.",
+        analogy: "**Draw the line from past clues to next month's sales** — simple, and easy to explain.",
         code: "from sklearn.linear_model import LinearRegression\nm = LinearRegression().fit(X_tr, y_tr)\npred = m.predict(X_te)\nfor mth, yhat, real in zip(d.month[cut:], pred, y_te):\n    print(mth.strftime('%Y-%m'), 'pred', round(yhat,1), 'actual', real)",
         checkpoint: "Six predictions print next to actuals, and they're in the right ballpark."
       },
@@ -245,6 +263,7 @@ window.PROJECTS = [
         title: "Beat the naive baseline",
         topic: "model-evaluation",
         detail: "A forecast is only good if it beats 'next month = this month'. Compare mean absolute error against that baseline — the honest test.",
+        analogy: "**Only trust it if it beats the lazy guess** — 'next month = this month'.",
         code: "from sklearn.metrics import mean_absolute_error\nnaive = X_te['lag1'].values                 # predict last month's value\nprint('model MAE:', round(mean_absolute_error(y_te, pred), 2))\nprint('naive MAE:', round(mean_absolute_error(y_te, naive), 2))\nprint('model wins' if mean_absolute_error(y_te,pred) < mean_absolute_error(y_te,naive) else 'baseline wins — rethink features')",
         checkpoint: "The model's MAE is lower than the naive baseline's — it's earning its keep."
       }
@@ -465,6 +484,7 @@ window.PROJECTS = [
         title: "Define your tools",
         topic: "ai-applications",
         detail: "A tool is just a Python function the model is allowed to call. Register a few in a dict — including a churn predictor backed by the model you trained in project 1.",
+        analogy: "**Give your assistant a labelled toolbox** — including the churn model you already trained.",
         code: "import joblib, pandas as pd\nclf = joblib.load('churn_model.joblib')   # from 'Train your first model'\n\ndef predict_churn(tenure_months, monthly_charge, support_calls, is_month_to_month):\n    x = pd.DataFrame([dict(tenure_months=tenure_months, monthly_charge=monthly_charge,\n                           support_calls=support_calls, is_month_to_month=is_month_to_month)])\n    return round(float(clf.predict_proba(x)[0, 1]), 3)\n\ndef calculator(expression):\n    return eval(expression, {'__builtins__': {}}, {})   # arithmetic only, no builtins\n\nTOOLS = {'predict_churn': predict_churn, 'calculator': calculator}\nprint('registered tools:', list(TOOLS))",
         checkpoint: "Two tools register; calling `predict_churn(2, 99, 5, 1)` returns a probability."
       },
@@ -472,6 +492,7 @@ window.PROJECTS = [
         title: "Describe the tools to the model",
         topic: "prompt-engineering",
         detail: "The LLM needs a spec of each tool and a strict output contract. Tell it to reply with JSON only — either a tool call or a final answer.",
+        analogy: "**Write the house rules:** reply in strict JSON — either call a tool or give the final answer.",
         code: "TOOL_SPEC = '''\npredict_churn(tenure_months:int, monthly_charge:float, support_calls:int, is_month_to_month:int) -> float\ncalculator(expression:str) -> number\n'''\nSYSTEM = (\n    'You can call tools. To call one, reply with ONLY JSON:\\n'\n    '{\"tool\": \"<name>\", \"args\": {...}}\\n'\n    'When you have the final answer, reply with ONLY JSON:\\n'\n    '{\"answer\": \"<text>\"}\\n'\n    'Tools:\\n' + TOOL_SPEC\n)\nprint(SYSTEM)",
         checkpoint: "The system prompt prints with the tool signatures and the JSON contract."
       },
@@ -479,6 +500,7 @@ window.PROJECTS = [
         title: "Parse a tool call",
         topic: "ai-applications",
         detail: "Models wrap JSON in chatter. Pull out the first JSON object; if there isn't one, treat the whole reply as the answer.",
+        analogy: "**Read past the chit-chat** and pull out the one JSON instruction.",
         code: "import json, re\ndef parse(text):\n    m = re.search(r'\\{.*\\}', text, re.S)   # first JSON object\n    return json.loads(m.group(0)) if m else {'answer': text}\n\nprint(parse('sure! {\"tool\": \"calculator\", \"args\": {\"expression\": \"2+2\"}}'))",
         checkpoint: "Prints {'tool': 'calculator', 'args': {'expression': '2+2'}} — parsing works."
       },
@@ -486,6 +508,7 @@ window.PROJECTS = [
         title: "Write the reason–act loop",
         topic: "generative-ai-llm",
         detail: "The controller: send the conversation to the local LLM, parse its reply, run the tool it asks for, feed the observation back, and repeat until it answers or hits the step cap.",
+        analogy: "**The routine:** think → use a tool → look at the result → repeat until the job's done.",
         code: "import ollama\n\ndef run(task, max_steps=5):\n    msgs = [{'role': 'system', 'content': SYSTEM},\n            {'role': 'user', 'content': task}]\n    for _ in range(max_steps):\n        out = ollama.chat(model='llama3.2:3b', messages=msgs)['message']['content']\n        step = parse(out)\n        if 'answer' in step:\n            return step['answer']\n        obs = TOOLS[step['tool']](**step.get('args', {}))      # ACT\n        print('  ->', step['tool'], step.get('args', {}), '=', obs)\n        msgs.append({'role': 'assistant', 'content': out})\n        msgs.append({'role': 'user', 'content': 'Observation: ' + str(obs)})\n    return 'stopped: max steps reached'\n\nprint(run('Customer: tenure 2, charge 99, 5 support calls, month-to-month. Is churn risk above 0.5?'))",
         checkpoint: "The agent calls predict_churn, reads the score, and returns a yes/no answer — a loop you wrote, driven by a local model."
       },
@@ -493,6 +516,7 @@ window.PROJECTS = [
         title: "Add guardrails and memory",
         topic: "mlops-monitoring",
         detail: "Real agents fail safely. Allowlist tool names, catch tool errors, and keep the step cap. Persist `msgs` across calls to give the agent conversational memory.",
+        analogy: "**Fail safely:** only known tools, catch errors, cap the steps, and remember the conversation.",
         code: "def safe_act(name, args):\n    if name not in TOOLS:\n        return 'error: unknown tool ' + str(name)\n    try:\n        return TOOLS[name](**args)\n    except Exception as e:\n        return 'error: ' + str(e)\n\n# In run(), replace TOOLS[step['tool']](...) with safe_act(step['tool'], step.get('args', {})).\n# Memory: keep the same `msgs` list between run() calls for multi-turn context.\nprint('guardrails: step cap + tool allowlist + error capture')",
         checkpoint: "Unknown tools and bad arguments now return a handled error string instead of crashing the loop."
       }
@@ -535,6 +559,7 @@ window.PROJECTS = [
         title: "Get a tool-capable local model",
         topic: "generative-ai-llm",
         detail: "Function calling needs a model trained for it. llama3.1:8b is a solid local choice; qwen2.5:3b is lighter if RAM is tight. Sizes below are rough RAM/VRAM needs.",
+        analogy: "**Hire an assistant that actually knows how to use tools** — not every model does.",
         code: "# Tool-capable local models:\nollama pull llama3.1:8b     # ~4.7 GB, wants ~8 GB RAM/VRAM\n# lighter option:\nollama pull qwen2.5:3b      # ~2 GB\n\npip install ollama\nollama list                 # confirm it downloaded",
         checkpoint: "`ollama list` shows a tool-capable model ready to use."
       },
@@ -542,6 +567,7 @@ window.PROJECTS = [
         title: "Write real local action functions",
         topic: "ai-applications",
         detail: "These functions actually DO things on your machine. Sandbox every path to the working folder so the agent can't wander off it.",
+        analogy: "**Give it real chores** — read a file, score a customer — but fence it inside the working folder.",
         code: "import os, joblib, pandas as pd\nALLOWED = os.path.abspath('.')\n\ndef _safe(name):\n    p = os.path.abspath(os.path.join(ALLOWED, name))\n    return p if p.startswith(ALLOWED) else None\n\ndef list_files(subdir='.'):\n    p = _safe(subdir)\n    return os.listdir(p) if p else 'blocked: outside working folder'\n\ndef read_file(name):\n    p = _safe(name)\n    if not p:\n        return 'blocked'\n    with open(p, encoding='utf-8') as f:\n        return f.read()[:2000]\n\n_clf = joblib.load('churn_model.joblib')\ndef churn_score(tenure_months, monthly_charge, support_calls, is_month_to_month):\n    x = pd.DataFrame([dict(tenure_months=tenure_months, monthly_charge=monthly_charge,\n                           support_calls=support_calls, is_month_to_month=is_month_to_month)])\n    return round(float(_clf.predict_proba(x)[0, 1]), 3)\n\nACTIONS = {'list_files': list_files, 'read_file': read_file, 'churn_score': churn_score}\nprint('actions ready:', list(ACTIONS))",
         checkpoint: "The actions register, and a path outside the working folder returns 'blocked'."
       },
@@ -549,6 +575,7 @@ window.PROJECTS = [
         title: "Declare the tools in Ollama's schema",
         topic: "prompt-engineering",
         detail: "Ollama accepts OpenAI-style JSON tool definitions. Describe each action so the model knows when and how to call it.",
+        analogy: "**Post the job descriptions** so the model knows exactly which tool does what.",
         code: "tools = [\n  {'type': 'function', 'function': {\n    'name': 'list_files',\n    'description': 'List files in a subfolder of the working directory.',\n    'parameters': {'type': 'object',\n      'properties': {'subdir': {'type': 'string'}}, 'required': []}}},\n  {'type': 'function', 'function': {\n    'name': 'read_file',\n    'description': 'Read the first 2000 chars of a text file.',\n    'parameters': {'type': 'object',\n      'properties': {'name': {'type': 'string'}}, 'required': ['name']}}},\n  {'type': 'function', 'function': {\n    'name': 'churn_score',\n    'description': 'Predict churn probability (0-1) for one customer.',\n    'parameters': {'type': 'object', 'properties': {\n      'tenure_months': {'type': 'integer'}, 'monthly_charge': {'type': 'number'},\n      'support_calls': {'type': 'integer'}, 'is_month_to_month': {'type': 'integer'}},\n      'required': ['tenure_months','monthly_charge','support_calls','is_month_to_month']}}},\n]\nprint(len(tools), 'tools declared')",
         checkpoint: "Three tool schemas are declared and ready to pass to the model."
       },
@@ -556,6 +583,7 @@ window.PROJECTS = [
         title: "Let the model call actions",
         topic: "generative-ai-llm",
         detail: "Pass `tools` to ollama.chat. The model replies with structured tool_calls; you execute each, append the result as a 'tool' message, and loop until it gives a final answer.",
+        analogy: "**Hand over the keys:** it asks for a tool, you run it, feed back the result, and repeat.",
         code: "import ollama, json\n\ndef agent(task, model='llama3.1:8b'):\n    msgs = [{'role': 'user', 'content': task}]\n    while True:\n        r = ollama.chat(model=model, messages=msgs, tools=tools)\n        m = r['message']\n        if not m.get('tool_calls'):\n            return m['content']                      # final answer\n        msgs.append(m)\n        for call in m['tool_calls']:\n            name = call['function']['name']\n            args = call['function']['arguments']\n            result = ACTIONS[name](**args)           # DO the action\n            print('  ->', name, args, '=', str(result)[:80])\n            msgs.append({'role': 'tool', 'content': json.dumps(result, default=str)})\n\nprint(agent('List the files here, then read README.md and summarise it in one line.'))",
         checkpoint: "The model calls list_files, then read_file, then answers — real local actions chosen by a local model."
       },
@@ -563,6 +591,7 @@ window.PROJECTS = [
         title: "Gate risky actions behind confirmation",
         topic: "mlops-monitoring",
         detail: "Read-only tools can run automatically; anything that writes, deletes, or executes must ask a human first. This one rule keeps an autonomous local agent safe.",
+        analogy: "**Reading is fine unattended; writing or deleting must ask you first.**",
         code: "RISKY = {'write_file', 'delete_file', 'run_shell'}\n\ndef guarded(name, args):\n    if name in RISKY:\n        ok = input('Approve ' + name + ' ' + str(args) + '? [y/N] ')\n        if ok.strip().lower() != 'y':\n            return 'denied by user'\n    return ACTIONS[name](**args)\n# In agent(), call guarded(name, args) instead of ACTIONS[name](**args).\n# Golden rules: allowlist tools, sandbox paths, confirm writes, never auto-run shell.\nprint('risky actions now require human approval')",
         checkpoint: "Write/delete/shell actions pause for a y/N — the agent acts locally without being able to do damage unattended."
       }
