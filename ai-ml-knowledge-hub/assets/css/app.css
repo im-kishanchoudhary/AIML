@@ -320,6 +320,8 @@ pre.code .str { color: #aebf92; }
 .gl-item .gl-def { font-size: 14px; color: color-mix(in srgb, var(--color-text) 78%, transparent); }
 .gl-item a.gl-link { font-size: 12px; color: var(--color-accent-700); text-decoration: none; white-space: nowrap; }
 .gl-item a.gl-link:hover { text-decoration: underline; }
+.gl-item .gl-analogy { margin-top: 8px; font-size: 13px; line-height: 1.5; color: color-mix(in srgb, var(--color-text) 70%, transparent); background: var(--color-accent-2-100); border-radius: var(--radius-sm, 8px); padding: 7px 10px; }
+.gl-item .gl-analogy .gl-analogy-k { font-weight: 600; color: var(--color-accent-2-700); }
 
 /* ---------- Search modal ---------- */
 .search-modal {

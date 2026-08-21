@@ -246,9 +246,13 @@
     h += prereqStrip(t);
     // key takeaway up top as TL;DR
     h += '<div class="tldr"><span class="tldr-ico">' + ICONS.bulb + '</span><div><div class="tldr-label">Key takeaway</div><div class="tldr-text">' + md(t.keyTakeaway) + "</div></div></div>";
-    h += calloutsHtml(t);
     h += analogyHtml(t);
+    // beginner-first: show the picture BEFORE the formal explanation
+    if (t.viz && window.VIZ && window.VIZ[t.viz]) {
+      h += '<div class="sec"><h2>See it in action</h2><div class="viz-box"><div class="viz" id="vizHost"></div></div></div>';
+    }
     h += flowHtml(t.flow);
+    h += calloutsHtml(t);
 
     var n = 1;
     h += sec(n++, "What is it?", '<p class="lead">' + md(t.definition) + "</p>");
@@ -257,10 +261,6 @@
     h += sec(n++, "How it works", "<p>" + md(t.howItWorks) + "</p>");
     if (t.walkthrough && t.walkthrough.length) h += walkthroughHtml(t, n++);
     h += sec(n++, "Real-world example", "<p>" + md(t.example) + "</p>");
-    // visualization
-    if (t.viz && window.VIZ && window.VIZ[t.viz]) {
-      h += '<div class="sec"><h2><span class="n">' + (n++) + '</span>Interactive visualization</h2><div class="viz-box"><div class="viz" id="vizHost"></div></div></div>';
-    }
     if (t.code) {
       h += sec(n++, "Python example", '<div class="code-cap">Python · runnable pattern</div><pre class="code"><code>' + highlightPy(t.code) + "</code></pre>");
     }
@@ -338,7 +338,9 @@
     GLOSSARY.slice().sort(function (a, b) { return a.term.localeCompare(b.term); }).forEach(function (g) {
       h += '<div class="gl-item"><div class="gl-term">' + esc(g.term) +
         (g.topic && BY_ID[g.topic] ? ' <a class="gl-link" href="#t/' + g.topic + '">read more →</a>' : "") +
-        '</div><div class="gl-def">' + esc(g.definition) + "</div></div>";
+        '</div><div class="gl-def">' + esc(g.definition) + "</div>" +
+        (g.analogy ? '<div class="gl-analogy"><span class="gl-analogy-k">Like</span> ' + md(g.analogy) + "</div>" : "") +
+        "</div>";
     });
     h += "</div></div>";
     content.innerHTML = h; content.scrollTop = 0;
@@ -527,8 +529,8 @@
       '<div class="topic-actions"><button class="btn btn-primary complete-btn' + (isDone(t.id) ? " is-done" : "") + '" id="completeBtn">' + (isDone(t.id) ? ICONS.check + " Completed" : "Mark as complete") + "</button>" +
       '<a class="btn btn-secondary" href="#t/' + t.id + '" id="toLearn">Full explanation →</a></div></div>';
     h += prereqStrip(t);
-    h += calloutsHtml(t);
     h += analogyHtml(t);
+    h += calloutsHtml(t);
     h += '<div class="cheat-grid">';
     h += '<div class="cheat-cell"><div class="cheat-k">What it is</div><div class="cheat-v">' + md(t.definition) + "</div></div>";
     h += '<div class="cheat-cell"><div class="cheat-k">Problem it solves</div><div class="cheat-v">' + md(t.problem) + "</div></div>";
