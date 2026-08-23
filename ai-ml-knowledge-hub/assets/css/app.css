@@ -163,6 +163,15 @@ body { min-height: 100vh; }
 .hero p { font-size: 17px; max-width: 60ch; color: color-mix(in srgb, var(--color-text) 78%, transparent); }
 .hero-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4); }
 
+/* First-timer on-ramp card */
+.starthere { display: flex; align-items: center; gap: 14px; text-decoration: none; margin-bottom: var(--space-6); padding: var(--space-4) var(--space-5); border-radius: var(--radius-lg); background: color-mix(in srgb, var(--color-accent-2) 14%, var(--color-surface)); border: 1.5px solid color-mix(in srgb, var(--color-accent-2) 40%, transparent); transition: transform .12s, box-shadow .12s, border-color .12s; }
+.starthere:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--color-accent-2-500); }
+.starthere .sh-ico { flex: none; color: var(--color-accent-2-700); display: flex; }
+.starthere .sh-ico svg { width: 26px; height: 26px; }
+.starthere .sh-body { display: flex; flex-direction: column; gap: 3px; }
+.starthere .sh-title { font-family: var(--font-heading); font-size: 18px; color: var(--color-text); }
+.starthere .sh-sub { font-size: 14px; color: color-mix(in srgb, var(--color-text) 68%, transparent); line-height: 1.5; }
+
 .section-title {
   font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;
   color: color-mix(in srgb, var(--color-text) 55%, transparent);

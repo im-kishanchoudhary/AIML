@@ -82,8 +82,8 @@
     { id: "visual", label: "Visual", sub: "All diagrams" }
   ];
   var COLLECTION_MODES = { interview: 1, compare: 1, visual: 1 };
-  var mode = load(LS_MODE, "cheat");
-  if (!MODES.some(function (m) { return m.id === mode; })) mode = "cheat";
+  var mode = load(LS_MODE, "learn");
+  if (!MODES.some(function (m) { return m.id === mode; })) mode = "learn";
   var interviewScore = load(LS_INTERVIEW, {}); // legacy self-score (migrated into SR)
   var LS_SR = "aihub.sr.v1";
   var LS_QUIZWRONG = "aihub.quizwrong.v1";
@@ -358,6 +358,14 @@
       '<a class="btn btn-primary" href="#t/' + ORDER[0] + '">Start from the beginning ' + ICONS.arrow.replace('width="20" height="20"', 'width="16" height="16"') + "</a>" +
       '<button class="btn btn-secondary" id="heroSearch">' + ICONS.search.replace('width="20" height="20"', 'width="16" height="16"') + " Search topics</button>" +
       "</div></div>";
+
+    // first-timer on-ramp
+    if (PATH_BY_ID["first-model"]) {
+      h += '<a class="starthere" href="#path/first-model">' +
+        '<span class="sh-ico">' + ICONS.bulb + "</span>" +
+        '<span class="sh-body"><span class="sh-title">New to all this? Start here →</span>' +
+        '<span class="sh-sub">A gentle, ordered path from zero to your first working model — one small step at a time.</span></span></a>';
+    }
 
     // resume / recently viewed
     var recentValid = recent.filter(function (r) { return BY_ID[r]; });
