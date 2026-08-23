@@ -99,3 +99,15 @@ definition, rendered by `renderGlossary`.
 
 **Progress:** 45 / 45 topics ✅ · 37 / 37 glossary ✅ · 42 / 42 project steps ✅.
 Every surface of the hub now carries a real-world analogy and a picture.
+
+## Beginner-comprehension + all-levels depth (done)
+
+- **Default to Learn mode** for new visitors (was the terse Cheat view); a
+  **"New here? Start here"** card on Home routes into the Beginner path.
+- **"In one line"** ≤12-word summary at the very top of all 45 topics.
+- **Reveal-more depth selector** on every topic — Beginner → Intermediate →
+  Advanced → Pro cumulatively unhides deeper existing sections; choice persists;
+  section numbers renumber per depth via a CSS counter.
+- **"Pro tip"** expert nugget on all 45 topics, shown only at Pro depth.
+- **Inline glossary tooltips** — hover / focus / tap a jargon word for its plain
+  meaning + analogy (never inside code).
