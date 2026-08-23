@@ -253,6 +253,30 @@ body { min-height: 100vh; }
 }
 .sec > h2 .n { color: color-mix(in srgb, var(--color-text) 35%, transparent); }
 .sec p { font-size: 16px; line-height: 1.65; }
+
+/* Section numbering via a CSS counter so numbers stay sequential at each depth
+   (display:none sections are not counted). Only leveled sections are numbered. */
+.content-inner { counter-reset: sec; }
+.sec[data-lvl] > h2::before { counter-increment: sec; content: counter(sec) "."; color: color-mix(in srgb, var(--color-text) 35%, transparent); }
+
+/* Depth reveal-more: hide sections deeper than the chosen level (cumulative) */
+.content-inner.depth-b .sec[data-lvl="i"],
+.content-inner.depth-b .sec[data-lvl="a"],
+.content-inner.depth-b .sec[data-lvl="p"],
+.content-inner.depth-i .sec[data-lvl="a"],
+.content-inner.depth-i .sec[data-lvl="p"],
+.content-inner.depth-a .sec[data-lvl="p"] { display: none; }
+
+/* Depth selector */
+.depth-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: var(--space-5) 0; padding: 10px 14px; background: var(--color-surface); border-radius: var(--radius-md); }
+.depth-k { font-size: 13px; color: color-mix(in srgb, var(--color-text) 62%, transparent); }
+.depth-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.depth-chip { font-size: 13px; padding: 6px 14px; border-radius: 999px; border: 1.5px solid var(--color-divider); background: var(--color-bg); color: var(--color-text); cursor: pointer; transition: background .12s, border-color .12s, color .12s; }
+.depth-chip:hover { border-color: var(--color-accent-400); }
+.depth-chip.active { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-bg); }
+
+/* Pro tip */
+.sec.protip .protip-box { background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface)); border-left: 4px solid var(--color-accent); border-radius: var(--radius-md); padding: 12px 16px; line-height: 1.65; font-size: 15px; }
 .sec .lead { font-size: 17px; }
 
 .pill-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }

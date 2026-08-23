@@ -85,6 +85,8 @@
   var mode = load(LS_MODE, "learn");
   if (!MODES.some(function (m) { return m.id === mode; })) mode = "learn";
   var interviewScore = load(LS_INTERVIEW, {}); // legacy self-score (migrated into SR)
+  var LS_DEPTH = "aihub.depth.v1";
+  var topicDepth = load(LS_DEPTH, "b"); // b|i|a|p — how deep the reader wants topics
   var LS_SR = "aihub.sr.v1";
   var LS_QUIZWRONG = "aihub.quizwrong.v1";
   var LS_QUIZSCORE = "aihub.quizscore.v1";
@@ -200,9 +202,29 @@
   }
 
   // ---------- Rendering: sections ----------
-  function sec(n, title, body) {
+  function sec(title, body, level) {
     if (!body) return "";
-    return '<div class="sec"><h2><span class="n">' + n + '</span>' + esc(title) + '</h2>' + body + "</div>";
+    return '<div class="sec"' + (level ? ' data-lvl="' + level + '"' : "") + '><h2>' + esc(title) + "</h2>" + body + "</div>";
+  }
+  // Depth selector: reveal-more from Beginner to Pro.
+  var DEPTHS = [["b", "Beginner"], ["i", "Intermediate"], ["a", "Advanced"], ["p", "Pro"]];
+  function depthBarHtml() {
+    return '<div class="depth-bar"><span class="depth-k">How deep do you want to go?</span><div class="depth-chips">' +
+      DEPTHS.map(function (d) { return '<button class="depth-chip" data-depth="' + d[0] + '">' + d[1] + "</button>"; }).join("") +
+      "</div></div>";
+  }
+  function applyDepth() {
+    var ci = content.querySelector(".content-inner");
+    if (ci) { ci.classList.remove("depth-b", "depth-i", "depth-a", "depth-p"); ci.classList.add("depth-" + topicDepth); }
+    Array.prototype.forEach.call(content.querySelectorAll(".depth-chip"), function (b) {
+      b.classList.toggle("active", b.getAttribute("data-depth") === topicDepth);
+    });
+  }
+  function wireDepth() {
+    Array.prototype.forEach.call(content.querySelectorAll(".depth-chip"), function (b) {
+      b.addEventListener("click", function () { topicDepth = b.getAttribute("data-depth"); save(LS_DEPTH, topicDepth); applyDepth(); });
+    });
+    applyDepth();
   }
   function listBlock(items, cls) {
     if (!items || !items.length) return "";
@@ -254,31 +276,37 @@
     h += flowHtml(t.flow);
     h += calloutsHtml(t);
 
-    var n = 1;
-    h += sec(n++, "What is it?", '<p class="lead">' + md(t.definition) + "</p>");
-    h += sec(n++, "Why it exists", "<p>" + md(t.why) + "</p>");
-    h += sec(n++, "Problem it solves", "<p>" + md(t.problem) + "</p>");
-    h += sec(n++, "How it works", "<p>" + md(t.howItWorks) + "</p>");
-    if (t.walkthrough && t.walkthrough.length) h += walkthroughHtml(t, n++);
-    h += sec(n++, "Real-world example", "<p>" + md(t.example) + "</p>");
+    // depth selector — start simple, reveal more up to Pro
+    h += depthBarHtml();
+    // Beginner (b)
+    h += sec("What is it?", '<p class="lead">' + md(t.definition) + "</p>", "b");
+    // Intermediate (i)
+    h += sec("Why it exists", "<p>" + md(t.why) + "</p>", "i");
+    h += sec("Problem it solves", "<p>" + md(t.problem) + "</p>", "i");
+    h += sec("How it works", "<p>" + md(t.howItWorks) + "</p>", "i");
+    if (t.walkthrough && t.walkthrough.length) h += walkthroughHtml(t, "i");
+    // Beginner (b)
+    h += sec("Real-world example", "<p>" + md(t.example) + "</p>", "b");
+    // Advanced (a)
     if (t.code) {
-      h += sec(n++, "Python example", '<div class="code-cap">Python · runnable pattern</div><pre class="code"><code>' + highlightPy(t.code) + "</code></pre>");
+      h += sec("Python example", '<div class="code-cap">Python · runnable pattern</div><pre class="code"><code>' + highlightPy(t.code) + "</code></pre>", "a");
     }
-    h += sec(n++, "Engineering connection", "<p>" + md(t.engineering) + "</p>");
-    // when / when not
+    h += sec("Engineering connection", "<p>" + md(t.engineering) + "</p>", "a");
     if ((t.whenToUse && t.whenToUse.length) || (t.whenNotToUse && t.whenNotToUse.length)) {
-      h += '<div class="sec"><h2><span class="n">' + (n++) + '</span>When to use it — and when not</h2><div class="two-col">' +
+      h += '<div class="sec" data-lvl="a"><h2>When to use it — and when not</h2><div class="two-col">' +
         '<div><div class="cmp-title">Reach for it when</div>' + listBlock(t.whenToUse, "good") + "</div>" +
         '<div><div class="cmp-title">Prefer something else when</div>' + listBlock(t.whenNotToUse, "bad") + "</div></div></div>";
     }
-    h += sec(n++, "Limitations", listBlock(t.limitations, "neutral"));
-    if (t.comparison) h += sec(n++, "Common comparison", cmpTable(t.comparison));
-    if (t.practical) h += practicalHtml(t, n++);
-    // related
+    if (t.comparison) h += sec("Common comparison", cmpTable(t.comparison), "a");
+    // Pro (p)
+    h += sec("Limitations", listBlock(t.limitations, "neutral"), "p");
+    if (t.practical) h += practicalHtml(t, "p");
+    if (t.proTip) h += '<div class="sec protip" data-lvl="p"><h2>' + ICONS.bulb.replace('width="20" height="20"', 'width="17" height="17"') + ' Pro tip</h2><div class="protip-box">' + md(t.proTip) + "</div></div>";
+    // related (always shown)
     if (t.related && t.related.length) {
       var rel = t.related.filter(function (r) { return BY_ID[r]; });
       if (rel.length) {
-        h += '<div class="sec"><h2><span class="n">' + (n++) + '</span>Related concepts</h2><div class="related-row">' +
+        h += '<div class="sec"><h2>Related concepts</h2><div class="related-row">' +
           rel.map(function (r) { return '<a class="rel-chip" href="#t/' + r + '">' + esc(BY_ID[r].title) + " " + ICONS.arrow.replace('width="20" height="20"', 'width="14" height="14"') + "</a>"; }).join("") +
           "</div></div>";
       }
@@ -301,6 +329,7 @@
     });
     wirePracticals();
     wireFlows();
+    wireDepth();
     var vizHost = $("#vizHost");
     if (vizHost && t.viz && window.VIZ[t.viz]) {
       if (window.__loadVizPalette) window.__loadVizPalette();
@@ -492,17 +521,17 @@
       });
     });
   }
-  function walkthroughHtml(t, n) {
+  function walkthroughHtml(t, level) {
     if (!t.walkthrough || !t.walkthrough.length) return "";
     var steps = t.walkthrough.map(function (s) {
       return '<li><div class="wt-t">' + esc(s.t) + '</div><div class="wt-d">' + md(s.d) + "</div></li>";
     }).join("");
-    return '<div class="sec"><h2>' + (n != null ? '<span class="n">' + n + "</span>" : "") + 'Step-by-step walkthrough</h2><ol class="walkthrough">' + steps + "</ol></div>";
+    return '<div class="sec"' + (level ? ' data-lvl="' + level + '"' : "") + '><h2>Step-by-step walkthrough</h2><ol class="walkthrough">' + steps + "</ol></div>";
   }
-  function practicalHtml(t, n) {
+  function practicalHtml(t, level) {
     var p = t.practical;
     if (!p) return "";
-    var h = '<div class="sec practical"><h2>' + (n != null ? '<span class="n">' + n + "</span>" : "") + ICONS.bulb.replace('width="20" height="20"', 'width="17" height="17"') + ' Try it yourself</h2>';
+    var h = '<div class="sec practical"' + (level ? ' data-lvl="' + level + '"' : "") + '><h2>' + ICONS.bulb.replace('width="20" height="20"', 'width="17" height="17"') + ' Try it yourself</h2>';
     h += '<div class="practical-box">';
     h += '<div class="pr-goal">' + md(p.goal) + "</div>";
     if (p.steps && p.steps.length) h += '<ol class="pr-steps">' + p.steps.map(function (s) { return "<li>" + md(s) + "</li>"; }).join("") + "</ol>";
