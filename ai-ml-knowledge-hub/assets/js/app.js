@@ -331,6 +331,7 @@
     wirePracticals();
     wireFlows();
     wireDepth();
+    linkGlossary(content);
     var vizHost = $("#vizHost");
     if (vizHost && t.viz && window.VIZ[t.viz]) {
       if (window.__loadVizPalette) window.__loadVizPalette();
@@ -491,6 +492,58 @@
     if (t.actuallyDoes) h += '<div class="callout does"><div class="callout-k">What it actually does</div><div class="callout-v">' + md(t.actuallyDoes) + "</div></div>";
     return h ? '<div class="callout-row">' + h + "</div>" : "";
   }
+  // ---------- Inline glossary tooltips ----------
+  var GLOSSARY_MAP = null;
+  function glossaryMap() {
+    if (GLOSSARY_MAP) return GLOSSARY_MAP;
+    GLOSSARY_MAP = [];
+    GLOSSARY.forEach(function (g) {
+      var term = g.term.split("(")[0].split("/")[0].trim(); // "Bias (statistical)"->"Bias"
+      if (term.length < 3) return;
+      GLOSSARY_MAP.push({ term: term, def: g.definition, analogy: g.analogy || "" });
+    });
+    GLOSSARY_MAP.sort(function (a, b) { return b.term.length - a.term.length; }); // multi-word first
+    return GLOSSARY_MAP;
+  }
+  function linkGlossary(root) {
+    var terms = glossaryMap(), used = {};
+    var SKIP = /^(A|CODE|PRE|H1|H2|BUTTON|SCRIPT|STYLE)$/;
+    function skipped(node) {
+      var el = node.parentNode;
+      while (el && el !== root) {
+        if (el.nodeType === 1) {
+          if (SKIP.test(el.tagName)) return true;
+          var c = el.classList;
+          if (c && (c.contains("gl-tip") || c.contains("eli5") || c.contains("tldr") || c.contains("depth-bar") || c.contains("breadcrumb") || c.contains("code-cap"))) return true;
+        }
+        el = el.parentNode;
+      }
+      return false;
+    }
+    terms.forEach(function (e) {
+      if (used[e.term.toLowerCase()]) return;
+      var re = new RegExp("\\b" + e.term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b", "i");
+      var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null), node, target = null, m = null;
+      while ((node = walker.nextNode())) { if (skipped(node)) continue; m = node.nodeValue.match(re); if (m) { target = node; break; } }
+      if (!target) return;
+      used[e.term.toLowerCase()] = 1;
+      var idx = target.nodeValue.search(re), matched = target.nodeValue.substr(idx, m[0].length);
+      var after = target.splitText(idx); after.nodeValue = after.nodeValue.substr(m[0].length);
+      var span = document.createElement("span"); span.className = "gl-tip"; span.tabIndex = 0;
+      span.appendChild(document.createTextNode(matched));
+      var pop = document.createElement("span"); pop.className = "gl-tip-pop";
+      pop.innerHTML = "<b>" + esc(e.term) + "</b>" + esc(e.def) + (e.analogy ? '<span class="gl-tip-an">Like ' + esc(e.analogy) + "</span>" : "");
+      span.appendChild(pop);
+      span.addEventListener("click", function (ev) {
+        ev.stopPropagation();
+        var open = span.classList.contains("open");
+        Array.prototype.forEach.call(root.querySelectorAll(".gl-tip.open"), function (x) { x.classList.remove("open"); });
+        if (!open) span.classList.add("open");
+      });
+      target.parentNode.insertBefore(span, after);
+    });
+  }
+
   // Dead-simple one-liner shown at the very top of a topic (optional).
   function eli5Html(t) {
     if (!t.eli5) return "";
