@@ -265,6 +265,7 @@
       (isDone(id) ? ICONS.check + " Completed" : "Mark as complete") + "</button>" +
       "</div></div>";
 
+    h += eli5Html(t);
     h += prereqStrip(t);
     // key takeaway up top as TL;DR
     h += '<div class="tldr"><span class="tldr-ico">' + ICONS.bulb + '</span><div><div class="tldr-label">Key takeaway</div><div class="tldr-text">' + md(t.keyTakeaway) + "</div></div></div>";
@@ -490,6 +491,11 @@
     if (t.actuallyDoes) h += '<div class="callout does"><div class="callout-k">What it actually does</div><div class="callout-v">' + md(t.actuallyDoes) + "</div></div>";
     return h ? '<div class="callout-row">' + h + "</div>" : "";
   }
+  // Dead-simple one-liner shown at the very top of a topic (optional).
+  function eli5Html(t) {
+    if (!t.eli5) return "";
+    return '<div class="eli5"><span class="eli5-k">In one line</span><span class="eli5-v">' + md(t.eli5) + "</span></div>";
+  }
   // Real-world analogy callout (optional per topic).
   function analogyHtml(t) {
     if (!t.analogy) return "";
@@ -565,6 +571,7 @@
       '<p class="short">' + md(t.short) + "</p>" +
       '<div class="topic-actions"><button class="btn btn-primary complete-btn' + (isDone(t.id) ? " is-done" : "") + '" id="completeBtn">' + (isDone(t.id) ? ICONS.check + " Completed" : "Mark as complete") + "</button>" +
       '<a class="btn btn-secondary" href="#t/' + t.id + '" id="toLearn">Full explanation →</a></div></div>';
+    h += eli5Html(t);
     h += prereqStrip(t);
     h += analogyHtml(t);
     h += calloutsHtml(t);

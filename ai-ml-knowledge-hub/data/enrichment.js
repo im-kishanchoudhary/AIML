@@ -9,6 +9,8 @@
    ============================================================ */
 window.ENRICH = {
   "ml-fundamentals": {
+    eli5: "Learn the rules from examples instead of writing them.",
+    proTip: "More and cleaner data usually beats a fancier algorithm — invest there first.",
     analogy: "Like training a new hire by showing them thousands of past cases instead of handing them a rulebook. Show a child enough photos of cats and dogs and they learn the difference themselves — you never define 'cat'. Machine learning is exactly that: **learn the rule from examples, don't hand-write it.**",
     flow: {
       title: "How a model is built and used",
@@ -36,6 +38,8 @@ window.ENRICH = {
     }
   },
   "standardization": {
+    eli5: "Put features on the same scale so they compare fairly.",
+    proTip: "Fit the scaler on train only, then apply to test — fitting on all data leaks.",
     viz: "standardize",
     analogy: "Like **converting every price into one currency** before comparing. A €5 coffee and a ¥600 coffee only compare fairly once they're on the same scale. Features measured in dollars, years and counts need the same treatment — otherwise the biggest-numbered column wins by accident, not because it matters most.",
     prerequisites: ["variance-std", "numpy-vectorization"],
@@ -54,6 +58,8 @@ window.ENRICH = {
     }
   },
   "regression": {
+    eli5: "Predict a number by fitting a line to data.",
+    proTip: "Check the residuals; a high R² can still hide a bad, patterned fit.",
     analogy: "Like **drawing the single best trend line through a cloud of dots** and reading it off — 'bigger house ≈ higher price', made precise. Once you have the line, you can estimate the price of a house you've never seen by finding where it lands on it.",
     prerequisites: ["ml-fundamentals", "correlation"],
     plainWords: "You're drawing the single straight line that best passes through a cloud of dots, then using that line to guess the y for any new x — like eyeballing 'bigger house ≈ higher price' but done precisely.",
@@ -77,6 +83,8 @@ window.ENRICH = {
     }
   },
   "clustering": {
+    eli5: "Find natural groups in data that has no labels.",
+    proTip: "K-means assumes round, similar-size blobs; scale features first and pick k with the elbow/silhouette.",
     analogy: "Like **seating strangers at a wedding by who seems similar** — no name cards, no known groups, you just cluster people who resemble each other. It finds natural groups in *unlabelled* data (customer segments, say) without being told the answers in advance.",
     flow: {
       title: "How k-means finds groups",
@@ -103,6 +111,8 @@ window.ENRICH = {
     }
   },
   "tokens-embeddings": {
+    eli5: "Turning words into numbers that capture their meaning.",
+    proTip: "You pay per token and context is limited — long prompts cost money and get truncated.",
     viz: "embedding-map",
     analogy: "Like giving every word a **GPS coordinate in 'meaning space'**, so related words sit close together — 'king' near 'queen', 'Paris' near 'France'. The model can then do arithmetic with meaning instead of matching exact letters, which is why search finds 'refund' even when you typed 'money back'.",
     prerequisites: ["generative-ai-llm"],
@@ -127,6 +137,8 @@ window.ENRICH = {
     }
   },
   "rag": {
+    eli5: "Let the AI look things up before it answers.",
+    proTip: "Retrieval quality caps answer quality — chunking and a good embedder matter more than the LLM.",
     analogy: "Like an **open-book exam** instead of a memory test. A plain LLM answers from memory and can confidently bluff. RAG lets it look up the relevant page first and answer from what it just read — so it stays current and can **cite its source**, without re-memorising the whole book.",
     flow: {
       title: "The RAG loop",
@@ -162,6 +174,8 @@ window.ENRICH = {
 
   /* ---------- Foundations ---------- */
   "ds-ai-ml-overview": {
+    eli5: "Four buzzwords, nested: AI is biggest, GenAI the newest slice.",
+    proTip: "Reach for the simplest tool that works — a SQL query often beats an LLM.",
     flow: { title: "The nesting, outside in", stages: [
       { icon: "🌐", label: "AI", d: "Any machine acting smart — even hand-written rules." },
       { icon: "📈", label: "Machine Learning", d: "A slice of AI that learns patterns from data." },
@@ -184,6 +198,8 @@ window.ENRICH = {
     }
   },
   "data-science-workflow": {
+    eli5: "Turn messy data into a decision, step by step.",
+    proTip: "Expect roughly 80% of the time on data cleaning, not modelling.",
     analogy: "Like **cooking a meal**. You shop for ingredients, wash and chop them, taste as you go, cook the dish, then plate it for guests. Data science is the same loop — and, like cooking, most of the effort is the unglamorous prep, not the fancy final step.",
     flow: {
       title: "The data science loop",
@@ -212,6 +228,8 @@ window.ENRICH = {
     }
   },
   "anaconda": {
+    eli5: "One install that sets up Python and all the data tools.",
+    proTip: "Use a fresh conda env per project; mixing dependencies is the #1 setup headache.",
     flow: { title: "What one install gives you", stages: [
       { icon: "⬇️", label: "Install once", d: "One download — no piecing tools together." },
       { icon: "🐍", label: "Python + tools", d: "Python, NumPy, pandas, Jupyter already included." },
@@ -234,6 +252,8 @@ window.ENRICH = {
     }
   },
   "jupyter": {
+    eli5: "A notebook where you write code and see results instantly.",
+    proTip: "Notebooks hide state — Restart & Run All before trusting results, and don't ship them to production.",
     flow: { title: "How a notebook flows", stages: [
       { icon: "✍️", label: "Write a cell", d: "A small chunk of code." },
       { icon: "▶️", label: "Run it", d: "Execute just that cell." },
@@ -257,6 +277,8 @@ window.ENRICH = {
     }
   },
   "colab": {
+    eli5: "Jupyter in your browser, on Google's free computers.",
+    proTip: "Free GPUs disconnect after idle or ~12h; checkpoint to Drive so you don't lose work.",
     flow: { title: "Colab in a nutshell", stages: [
       { icon: "🔗", label: "Open a link", d: "A notebook in your browser — nothing installed." },
       { icon: "☁️", label: "Google's machine", d: "Runs on their computer, for free." },
@@ -297,6 +319,8 @@ window.ENRICH = {
 
   /* ---------- Python ---------- */
   "python-why": {
+    eli5: "The easy, do-everything language of data and AI.",
+    proTip: "Python is slow in raw loops — push heavy work into NumPy/pandas (vectorized C).",
     flow: { title: "Why Python fits data work", stages: [
       { icon: "📖", label: "Readable", d: "Looks almost like English — easy to learn." },
       { icon: "📚", label: "Libraries", d: "A package for nearly everything (pandas, sklearn…)." },
@@ -319,6 +343,8 @@ window.ENRICH = {
     }
   },
   "python-data-structures": {
+    eli5: "Boxes for your data: lists, dictionaries, and sets.",
+    proTip: "Dict and set lookups are instant (O(1)); scanning a list is O(n) — choose accordingly.",
     flow: { title: "Pick the right container", stages: [
       { icon: "📝", label: "List", d: "Ordered items you add/remove — a shopping list." },
       { icon: "🔑", label: "Dict", d: "Look up a value by its key — a phone book." },
@@ -344,6 +370,8 @@ window.ENRICH = {
 
   /* ---------- NumPy ---------- */
   "numpy-ndarray": {
+    eli5: "A fast grid of numbers the computer crunches quickly.",
+    proTip: "Slices are views, not copies — editing a slice changes the original. Use .copy() when unsure.",
     flow: { title: "Why arrays are fast", stages: [
       { icon: "🧊", label: "Same type", d: "Every cell holds the same kind of number." },
       { icon: "📦", label: "Packed tight", d: "Stored in one contiguous block of memory." },
@@ -367,6 +395,8 @@ window.ENRICH = {
     }
   },
   "numpy-vectorization": {
+    eli5: "Do math on a whole array at once — no slow loops.",
+    proTip: "Broadcasting avoids loops but can silently blow up memory — watch your array shapes.",
     flow: { title: "Loop vs vectorized", stages: [
       { icon: "🐌", label: "Python loop", d: "One number at a time — slow." },
       { icon: "📸", label: "Vectorize", d: "Express the whole operation at once." },
@@ -392,6 +422,8 @@ window.ENRICH = {
 
   /* ---------- Pandas ---------- */
   "pandas-dataframe": {
+    eli5: "A spreadsheet you control with code.",
+    proTip: "Beware chained indexing (df[a][b] = ...) — use .loc to set values reliably.",
     flow: { title: "A DataFrame at a glance", stages: [
       { icon: "🧱", label: "Rows & columns", d: "A table, like a spreadsheet." },
       { icon: "🏷️", label: "Labels", d: "Named columns and an index to find rows." },
@@ -415,6 +447,8 @@ window.ENRICH = {
     }
   },
   "pandas-loading": {
+    eli5: "Pull a file or table into Python to work with.",
+    proTip: "Set dtypes and parse dates on read for big files, or you waste memory and time.",
     flow: { title: "Getting data in", stages: [
       { icon: "📁", label: "Point at a source", d: "A CSV, an Excel file, or a database." },
       { icon: "⬇️", label: "read_csv / read_sql", d: "One call pulls it into a DataFrame." },
@@ -438,6 +472,8 @@ window.ENRICH = {
     }
   },
   "pandas-cleaning": {
+    eli5: "Fix the gaps and mess before you analyse.",
+    proTip: "Decide *why* a value is missing — dropping vs filling changes your conclusions.",
     analogy: "Like **tidying a messy desk before you start work**. Real data arrives with gaps, wrong types and duplicates — you can't analyse a mess. Cleaning is the unglamorous 80% that makes the insightful 20% possible.",
     flow: {
       title: "A cleaning pass",
@@ -465,6 +501,8 @@ window.ENRICH = {
     }
   },
   "pandas-transform": {
+    eli5: "Reshape and combine tables to answer your question.",
+    proTip: "groupby().apply() is flexible but slow; prefer built-in aggregations on large data.",
     flow: { title: "Reshape the same data", stages: [
       { icon: "🧩", label: "Group", d: "Summarise rows into per-group numbers." },
       { icon: "🔄", label: "Pivot / melt", d: "Swap between wide and long layouts." },
@@ -490,6 +528,8 @@ window.ENRICH = {
 
   /* ---------- Visualization ---------- */
   "matplotlib": {
+    eli5: "Draw charts from your data with code.",
+    proTip: "For quick looks use pandas .plot(); reach for raw matplotlib only when you need control.",
     flow: { title: "Building a chart", stages: [
       { icon: "🖼️", label: "Make axes", d: "Create the figure and axes." },
       { icon: "✏️", label: "Plot data", d: "Add lines, bars or points." },
@@ -513,6 +553,8 @@ window.ENRICH = {
     }
   },
   "choosing-a-chart": {
+    eli5: "Pick the chart that makes your point clearest.",
+    proTip: "Avoid pie charts with many slices and dual y-axes — they mislead more than they reveal.",
     flow: { title: "Match the chart to the question", stages: [
       { icon: "🔢", label: "Compare categories", d: "Use a bar chart." },
       { icon: "📈", label: "Change over time", d: "Use a line chart." },
@@ -538,6 +580,8 @@ window.ENRICH = {
 
   /* ---------- Statistics ---------- */
   "descriptive-stats": {
+    eli5: "A few numbers that summarise a whole dataset.",
+    proTip: "Always pair the average with the spread; a single number hides the story.",
     analogy: "Like **summing up a whole crowd in one sentence** — 'mostly 30-somethings, average height 1.7 m, a few outliers'. Instead of staring at thousands of rows, a handful of numbers (mean, median, spread) tell you the shape of the data at a glance.",
     prerequisites: ["numpy-ndarray"],
     plainWords: "Before modelling, describe the data in a few numbers: the centre (mean/median/mode) and where it sits. The median resists outliers; the mean doesn't — that difference matters constantly.",
@@ -555,6 +599,8 @@ window.ENRICH = {
     }
   },
   "variance-std": {
+    eli5: "How spread out the numbers are around the average.",
+    proTip: "Std is in the data's units; variance is squared units — report std to humans.",
     analogy: "Like judging **how consistent a machine is**. Two machines both average 10 mm parts, but one makes 9.9–10.1 and the other 8–12. Same average, wildly different reliability. Standard deviation *is* that spread — how far values typically stray from the average.",
     prerequisites: ["descriptive-stats"],
     plainWords: "The mean tells you the centre; standard deviation tells you the spread — how far values typically sit from that centre. Two datasets can share a mean yet feel completely different.",
@@ -572,6 +618,8 @@ window.ENRICH = {
     }
   },
   "normal-distribution": {
+    eli5: "The bell curve: most values sit near the middle.",
+    proTip: "Don't assume normality — check with a histogram or Q-Q plot before relying on it.",
     analogy: "Like the **bell curve of human heights** — most people cluster near the average, with fewer and fewer very short or very tall. This same bell shape shows up everywhere in nature and measurement, which is why so many statistical methods assume it.",
     prerequisites: ["variance-std"],
     plainWords: "The normal (bell) curve describes tons of natural measurements: most values cluster near the mean and taper symmetrically. Its 68–95–99.7 rule tells you how much data falls within 1, 2, 3 std of the mean.",
@@ -589,6 +637,8 @@ window.ENRICH = {
     }
   },
   "correlation": {
+    eli5: "Do two things move together? (Not why.)",
+    proTip: "Near-zero correlation only rules out *linear* links — curved relationships can still be strong.",
     analogy: "Like noticing **ice-cream sales and sunburns rise together** — related, but one doesn't cause the other (hot weather drives both). Correlation measures whether two things move together, from -1 to +1. It's a hint to investigate, **never proof of cause**.",
     prerequisites: ["variance-std"],
     plainWords: "Correlation is a single number from -1 to +1 saying how tightly two things move together: +1 rise together, -1 one rises as the other falls, 0 no linear link. It never proves one causes the other.",
@@ -606,6 +656,8 @@ window.ENRICH = {
     }
   },
   "probability-basics": {
+    eli5: "Putting a number on how likely something is.",
+    proTip: "Independent events multiply; confusing P(A|B) with P(B|A) is the classic blunder.",
     viz: "probability",
     analogy: "Like a **weather forecast's '70% chance of rain'**. It doesn't say yes or no — it puts a number between 0 and 1 on how likely something is. Models speak this language too: a churn model says '0.83 likely to leave', not a flat yes.",
     prerequisites: ["descriptive-stats"],
@@ -624,6 +676,8 @@ window.ENRICH = {
     }
   },
   "hypothesis-testing": {
+    eli5: "Is this real, or just luck? Test it.",
+    proTip: "A small p-value isn't a big effect — report the effect size too.",
     viz: "p-value",
     analogy: "Like a **courtroom**. The default (the *null hypothesis*) is 'innocent — nothing is going on'. Your data is the evidence. The **p-value** is how surprising that evidence would be *if the defendant were truly innocent*; small enough, and you reject 'innocent'. You never *prove* innocence — you just fail to convict.",
     prerequisites: ["normal-distribution", "probability-basics"],
@@ -660,6 +714,8 @@ window.ENRICH = {
 
   /* ---------- Machine learning ---------- */
   "classification": {
+    eli5: "Sort things into labelled buckets.",
+    proTip: "On imbalanced data, accuracy lies — tune the threshold for precision/recall, not 0.5.",
     viz: "decision-boundary",
     analogy: "Like **sorting incoming mail into labelled bins** — spam vs not, approve vs review, churn vs stay. The model learns from past sorted mail what belongs in each bin, then drops each new item into the most likely one — usually with a confidence score.",
     prerequisites: ["ml-fundamentals", "train-test-split"],
@@ -678,6 +734,8 @@ window.ENRICH = {
     }
   },
   "feature-engineering": {
+    eli5: "Give the model better clues to learn from.",
+    proTip: "The biggest risk is leakage — never build a feature from info you won't have at prediction time.",
     viz: "feature-lift",
     analogy: "Like **giving a detective better clues**. The raw case file (the columns) might not crack it, but combine a few facts — 'spend per month of tenure', 'days since last login' — and the pattern jumps out. Often a smart feature beats a fancier model.",
     prerequisites: ["pandas-transform"],
@@ -696,6 +754,8 @@ window.ENRICH = {
     }
   },
   "train-test-split": {
+    eli5: "Keep some data hidden so you can test honestly.",
+    proTip: "For time series, split by time — a random split leaks the future into training.",
     analogy: "Like a **mock exam before the real one**. You practise on past papers (training data) but keep one paper sealed for the real test (test data). If you'd peeked at the sealed paper while studying, a great score would prove nothing — which is exactly why the test set is held out *before* any learning happens.",
     flow: {
       title: "Why you split the data first",
@@ -722,6 +782,8 @@ window.ENRICH = {
     }
   },
   "overfitting": {
+    eli5: "Memorising the practice test instead of learning.",
+    proTip: "A big train-vs-test gap is the tell; fix with more data, a simpler model, or regularization.",
     analogy: "Like a student who **memorised last year's exam paper** instead of learning the subject. Flawless on the questions they've already seen, lost the moment the questions change. A model that memorises its training data looks brilliant in rehearsal and then fails on real, unseen customers.",
     prerequisites: ["train-test-split"],
     plainWords: "Overfitting is memorising the training data — including its noise — so the model aces training but flops on new data. Underfitting is the opposite: too simple to capture the pattern. You want the middle.",
@@ -739,6 +801,8 @@ window.ENRICH = {
     }
   },
   "model-evaluation": {
+    eli5: "Measuring how good a model really is.",
+    proTip: "Choose the metric from the business cost of each error — before you train.",
     analogy: "Like a **report card, not a single grade**. *Judge a fish by its ability to climb a tree* and every fish fails — the wrong metric hides the truth. Accuracy alone flatters a model on rare events (say '99% not fraud' by never catching any fraud); precision and recall reveal what it actually catches and what it misses.",
     prerequisites: ["classification", "train-test-split"],
     plainWords: "Accuracy alone lies on imbalanced data. The confusion matrix splits right/wrong into types; precision asks 'of my positive calls, how many were right?' and recall asks 'of the real positives, how many did I catch?'.",
@@ -756,6 +820,8 @@ window.ENRICH = {
     }
   },
   "hyperparameter-tuning": {
+    eli5: "Turning the dials to get the best model.",
+    proTip: "Tune on validation (or cross-validation), never the test set — or your score is fiction.",
     flow: { title: "Finding good settings", stages: [
       { icon: "🎛️", label: "List the dials", d: "Depth, learning rate, k, and so on." },
       { icon: "🔀", label: "Try combinations", d: "Grid search or random search." },
@@ -779,6 +845,8 @@ window.ENRICH = {
     }
   },
   "sklearn-workflow": {
+    eli5: "The same fit-then-predict steps for any model.",
+    proTip: "Wrap steps in a Pipeline so scaling is fit on train folds only — no leakage.",
     analogy: "Like **one recipe that works for every dish**. Whatever the model, scikit-learn uses the same steps — `fit`, then `predict` / `transform` — so once you learn the pattern you can swap a random forest for a logistic regression by changing a single line.",
     flow: {
       title: "The scikit-learn pattern",
@@ -888,6 +956,8 @@ window.ENRICH = {
 
   /* ---------- Deep learning ---------- */
   "neural-networks": {
+    eli5: "Layers of simple units that learn patterns together.",
+    proTip: "They're data-hungry and easy to overfit; start small and add capacity only if needed.",
     analogy: "Like an **assembly line of specialists**. Raw input enters at one end; each layer of workers spots slightly more complex patterns (edges → shapes → faces) and passes its findings to the next. No single worker understands the whole job — the layers *together* do.",
     flow: {
       title: "How signal flows through the network",
@@ -915,6 +985,8 @@ window.ENRICH = {
     }
   },
   "activation-loss": {
+    eli5: "A neuron's on/off dial, plus a wrongness score.",
+    proTip: "Match the loss to the task (cross-entropy for classes, MSE for numbers); ReLU is the safe default.",
     viz: "activation",
     analogy: "Like a **dimmer switch plus a scorecard**. The *activation function* is a dimmer on each neuron — it decides how much signal passes and lets the network learn curves, not just straight lines. The *loss function* is the scorecard — one number saying how wrong the output was, which training then works to shrink.",
     prerequisites: ["neural-networks"],
@@ -933,6 +1005,8 @@ window.ENRICH = {
     }
   },
   "gradient-descent": {
+    eli5: "Nudge the model downhill until it stops improving.",
+    proTip: "The learning rate is everything — too high diverges, too low crawls. Tune it first.",
     analogy: "Like hiking down a mountain in thick fog. You can't see the valley, but you can feel which way slopes **downhill** under your feet, take a step that way, and repeat. The *learning rate* is your step size — tiny steps are slow, giant steps overshoot the valley and bounce around.",
     flow: {
       title: "One step of learning, repeated thousands of times",
@@ -960,6 +1034,8 @@ window.ENRICH = {
     }
   },
   "cnn-rnn-transformers": {
+    eli5: "Three neural designs for images, sequences, and language.",
+    proTip: "Rarely train from scratch — fine-tune a pretrained model; it's cheaper and better.",
     flow: { title: "Three tools, three jobs", stages: [
       { icon: "🔍", label: "CNN", d: "Slides a filter over an image for local patterns." },
       { icon: "➡️", label: "RNN", d: "Reads a sequence step by step, remembering." },
@@ -985,6 +1061,8 @@ window.ENRICH = {
 
   /* ---------- Generative AI ---------- */
   "generative-ai-llm": {
+    eli5: "AI that writes text by predicting the next word.",
+    proTip: "It predicts plausible text, not truth — verify facts and expect confident mistakes.",
     analogy: "Like a **very well-read intern doing super-charged autocomplete**. It has read a huge slice of the internet and, given some text, predicts the next word over and over — fluently enough to write essays, code and answers. It doesn't 'look up' facts; it predicts what a knowledgeable person would most likely say next.",
     flow: {
       title: "How an LLM turns your prompt into an answer",
@@ -1013,6 +1091,8 @@ window.ENRICH = {
     }
   },
   "prompt-engineering": {
+    eli5: "Asking an AI clearly so it does what you want.",
+    proTip: "Give an example (few-shot) and ask for a specific format; vague prompts get vague answers.",
     flow: { title: "Anatomy of a good prompt", stages: [
       { icon: "🎭", label: "Role", d: "Tell it who to be ('you are a tutor')." },
       { icon: "🎯", label: "Task", d: "State exactly what you want." },
@@ -1036,6 +1116,8 @@ window.ENRICH = {
     }
   },
   "vector-search": {
+    eli5: "Find things by meaning, not exact words.",
+    proTip: "Results are only as good as the embedding model and chunk size — tune both.",
     viz: "vector-search",
     analogy: "Like a **librarian who finds books by vibe, not exact title**. Ask for 'something about getting my money back' and keyword search shrugs; meaning-based search hands you the refund policy. It matches by *what the text means* — using the embedding vectors — not by the letters.",
     prerequisites: ["tokens-embeddings"],
@@ -1054,6 +1136,8 @@ window.ENRICH = {
     }
   },
   "rag-vs-finetuning": {
+    eli5: "Look it up, or teach it by heart?",
+    proTip: "Fine-tuning teaches style and format, not fresh facts — for changing knowledge, use RAG.",
     flow: { title: "Which one to reach for", stages: [
       { icon: "🔄", label: "Knowledge changing?", d: "Yes → RAG (edit a doc, done)." },
       { icon: "📎", label: "Need citations?", d: "Yes → RAG (points to the source)." },
@@ -1077,6 +1161,8 @@ window.ENRICH = {
     }
   },
   "ai-applications": {
+    eli5: "Plugging a model into a real product.",
+    proTip: "Treat the model as one unreliable service — add validation, fallbacks, and monitoring around it.",
     flow: { title: "A model inside a product", stages: [
       { icon: "🧠", label: "Trained model", d: "Sits behind an endpoint, like any service." },
       { icon: "📤", label: "App sends inputs", d: "Feature values over an API call." },
@@ -1102,6 +1188,8 @@ window.ENRICH = {
 
   /* ---------- MLOps ---------- */
   "mlops-lifecycle": {
+    eli5: "Ship a model and keep it working over time.",
+    proTip: "Version data and models, not just code — you must be able to reproduce any past prediction.",
     analogy: "Like **running the restaurant after opening night** — shipping the model is the launch, not the finish. The world drifts, tastes change, ingredients vary, so you keep watching, refreshing and re-cooking to stay good over time.",
     flow: {
       title: "The MLOps loop",
@@ -1129,6 +1217,8 @@ window.ENRICH = {
     }
   },
   "mlops-monitoring": {
+    eli5: "Watch a live model and catch problems early.",
+    proTip: "Watch input drift, not just accuracy — labels often arrive too late to catch decay in time.",
     flow: { title: "Watching a live model", stages: [
       { icon: "📡", label: "Track", d: "Log predictions, inputs and latency." },
       { icon: "📉", label: "Detect drift", d: "Flag when data or accuracy shifts." },
