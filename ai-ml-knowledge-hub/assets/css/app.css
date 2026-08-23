@@ -7,7 +7,7 @@
 :root {
   --sidebar-w: 300px;
   --topbar-h: 64px;
-  --content-max: 860px;
+  --content-max: 1620px;
 }
 
 html { scroll-behavior: smooth; }

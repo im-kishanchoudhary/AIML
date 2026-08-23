@@ -1,6 +1,7 @@
 # --- Design-tool handoff artifacts (not part of the hosted app) ---
 /Artifacts/
 /project/
+/assignement/
 /_ds/
 /uploads/
 .thumbnail
